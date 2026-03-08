@@ -1,4 +1,4 @@
-# @mcpskills/server
+# @mcpskillsio/server
 
 Trust-score any AI skill or MCP server from inside Claude Code, Cursor, or any MCP client.
 
@@ -9,7 +9,7 @@ Trust-score any AI skill or MCP server from inside Claude Code, Cursor, or any M
 ### Claude Code
 
 ```bash
-claude mcp add mcpskills -- npx @mcpskills/server
+claude mcp add mcpskills -- npx @mcpskillsio/server
 ```
 
 ### Cursor
@@ -21,7 +21,7 @@ Add to your `.cursor/mcp.json`:
   "mcpServers": {
     "mcpskills": {
       "command": "npx",
-      "args": ["@mcpskills/server"]
+      "args": ["@mcpskillsio/server"]
     }
   }
 }
@@ -36,7 +36,7 @@ Add to `claude_desktop_config.json`:
   "mcpServers": {
     "mcpskills": {
       "command": "npx",
-      "args": ["@mcpskills/server"]
+      "args": ["@mcpskillsio/server"]
     }
   }
 }
