@@ -7,6 +7,32 @@
   external_node_modules = ["satori", "@resvg/resvg-js"]
   included_files = ["lib/fonts/**"]
 
+# Clean URLs for blog and legal pages
+[[redirects]]
+  from = "/blog/state-of-ai-skill-security"
+  to = "/blog/state-of-ai-skill-security.html"
+  status = 200
+
+[[redirects]]
+  from = "/blog/clawhavoc-missing-trust-layer"
+  to = "/blog/clawhavoc-missing-trust-layer.html"
+  status = 200
+
+[[redirects]]
+  from = "/blog/how-to-check-ai-skill-safe"
+  to = "/blog/how-to-check-ai-skill-safe.html"
+  status = 200
+
+[[redirects]]
+  from = "/privacy"
+  to = "/privacy.html"
+  status = 200
+
+[[redirects]]
+  from = "/terms"
+  to = "/terms.html"
+  status = 200
+
 # Environment variables (set in Netlify UI, not here):
 # GITHUB_TOKEN — personal access token for 5,000 req/hr
 # Optional: CLAUDE_API_KEY — for README quality LLM assessment (V2)
