@@ -18,7 +18,7 @@
 
 ## Tools
 
-- [MCP Server (@mcpskillsio/server)](https://github.com/riseabovepartners/mcpskills-server): Install via `npx @mcpskillsio/server` to get trust scores inside Claude Code, Cursor, or any MCP client. Three tools: check_trust_score, scan_safety, list_packages.
+- [MCP Server (@mcpskillsio/server)](https://github.com/bebravebekind/mcpskills-server): Install via `npx @mcpskillsio/server` to get trust scores inside Claude Code, Cursor, or any MCP client. Three tools: check_trust_score, scan_safety, list_packages.
 
 ## Key Facts
 
