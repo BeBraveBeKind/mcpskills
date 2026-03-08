@@ -1,0 +1,63 @@
+{
+  "packages": [
+    {
+      "id": "cold-outbound-stack",
+      "name": "Cold Outbound Stack",
+      "tagline": "Send emails that land, with tools you can trust",
+      "repos": [
+        { "owner": "resend", "repo": "resend-node", "role": "Email API" },
+        { "owner": "resend", "repo": "react-email", "role": "Email Templates" },
+        { "owner": "nodemailer", "repo": "nodemailer", "role": "SMTP Fallback" },
+        { "owner": "reacherhq", "repo": "check-if-email-exists", "role": "Email Validation" },
+        { "owner": "agenda", "repo": "agenda", "role": "Job Scheduling" }
+      ]
+    },
+    {
+      "id": "ai-agent-starter",
+      "name": "AI Agent Starter",
+      "tagline": "Ship your first agent this weekend",
+      "repos": [
+        { "owner": "vercel", "repo": "ai", "role": "Multi-Provider LLM" },
+        { "owner": "anthropics", "repo": "anthropic-sdk-node", "role": "Tool Calling" },
+        { "owner": "chroma-core", "repo": "chroma", "role": "Vector Database" },
+        { "owner": "promptfoo", "repo": "promptfoo", "role": "Prompt Testing" },
+        { "owner": "colinhacks", "repo": "zod", "role": "Schema Validation" }
+      ]
+    },
+    {
+      "id": "auth-security-stack",
+      "name": "Auth & Security Stack",
+      "tagline": "Lock it down without locking yourself in",
+      "repos": [
+        { "owner": "nextauthjs", "repo": "next-auth", "role": "Auth Framework" },
+        { "owner": "clerk", "repo": "javascript", "role": "Managed Auth" },
+        { "owner": "arcjet", "repo": "arcjet-js", "role": "Rate Limiting" },
+        { "owner": "panva", "repo": "jose", "role": "JWT Handling" },
+        { "owner": "kelektiv", "repo": "node.bcrypt.js", "role": "Password Hashing" }
+      ]
+    },
+    {
+      "id": "payment-billing-stack",
+      "name": "Payment & Billing Stack",
+      "tagline": "Take money on day one",
+      "repos": [
+        { "owner": "stripe", "repo": "stripe-node", "role": "Payment Processing" },
+        { "owner": "stripe", "repo": "react-stripe-js", "role": "Payment UI" },
+        { "owner": "lmsqueezy", "repo": "lemonsqueezy.js", "role": "Merchant of Record" },
+        { "owner": "svix", "repo": "svix-webhooks", "role": "Webhook Handling" }
+      ]
+    },
+    {
+      "id": "landing-page-launcher",
+      "name": "Landing Page Launcher",
+      "tagline": "From idea to live page in an hour",
+      "repos": [
+        { "owner": "shadcn-ui", "repo": "ui", "role": "UI Components" },
+        { "owner": "react-hook-form", "repo": "react-hook-form", "role": "Form Handling" },
+        { "owner": "plausible", "repo": "analytics", "role": "Privacy Analytics" },
+        { "owner": "motiondivision", "repo": "motion", "role": "Animations" },
+        { "owner": "vercel", "repo": "satori", "role": "OG Image Generation" }
+      ]
+    }
+  ]
+}

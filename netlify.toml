@@ -1,0 +1,10 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+# Environment variables (set in Netlify UI, not here):
+# GITHUB_TOKEN — personal access token for 5,000 req/hr
+# Optional: CLAUDE_API_KEY — for README quality LLM assessment (V2)

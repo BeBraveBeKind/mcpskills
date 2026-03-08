@@ -1,0 +1,17 @@
+{
+  "name": "mcpskills",
+  "version": "0.1.0",
+  "description": "Trust-scored MCP servers and AI agent skills",
+  "scripts": {
+    "scan": "node scripts/scan.js",
+    "dev": "netlify dev",
+    "build": "echo 'Static site — no build step'"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "satori": "^0.25.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
