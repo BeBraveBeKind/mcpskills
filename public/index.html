@@ -4,13 +4,113 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MCP Skills — Is Your AI Skill Safe?</title>
-  <meta name="description" content="Trust-score any MCP server or AI agent skill. 12 signals. Safety scanning. Know before you install.">
+  <meta name="description" content="Trust-score any AI skill or MCP server. 12 signals across 4 dimensions. Safety scanning for prompt injection, credential theft, and supply chain attacks. Know before you install.">
   <meta property="og:title" content="MCP Skills — Is Your AI Skill Safe?">
-  <meta property="og:description" content="341 malicious AI skills were found in January 2026. Score yours before you install.">
+  <meta property="og:description" content="1,184 malicious AI skills were found in ClawHavoc. Score yours before you install.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://mcpskills.io">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "MCP Skills",
+    "url": "https://mcpskills.io",
+    "description": "Trust-score any AI skill or MCP server. 12 signals across 4 dimensions with safety scanning for prompt injection, credential theft, and supply chain attacks.",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web",
+    "datePublished": "2026-03-08",
+    "dateModified": "2026-03-08",
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Free Scan",
+        "price": "0",
+        "priceCurrency": "USD",
+        "description": "Trust tier badge, dimension scores, and rationale for any GitHub repo"
+      },
+      {
+        "@type": "Offer",
+        "name": "Full Report",
+        "price": "9.00",
+        "priceCurrency": "USD",
+        "description": "All 12 signal scores, safety scan findings, and Skills Mode analysis"
+      },
+      {
+        "@type": "Offer",
+        "name": "10-Pack",
+        "price": "29.00",
+        "priceCurrency": "USD",
+        "description": "10 full reports at $2.90 per scan"
+      }
+    ],
+    "author": {
+      "@type": "Person",
+      "name": "Michael Browne",
+      "url": "https://www.linkedin.com/in/michaelbrowne03/",
+      "sameAs": [
+        "https://www.linkedin.com/in/michaelbrowne03/",
+        "https://github.com/riseabovepartners"
+      ],
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Rise Above Partners",
+        "url": "https://rise-above.net"
+      }
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Rise Above Partners",
+      "url": "https://rise-above.net",
+      "sameAs": [
+        "https://rise-above.net",
+        "https://github.com/riseabovepartners"
+      ]
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How does MCP Skills trust scoring work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Every repo is evaluated across 4 dimensions — Alive (is it maintained?), Legit (who made it?), Solid (is it secure?), and Usable (can I work with it?). Each dimension combines multiple signals from the GitHub API, OpenSSF Scorecard, and our analysis engine to produce a composite score from 0 to 10."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is Skills Mode?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "When MCP Skills detects an AI agent skill or MCP server, the algorithm shifts to Skills Mode. Security weight increases and two additional signals activate: Skill Spec Compliance and Tool Safety. The safety scanner checks for prompt injection, shell execution, credential access, network exfiltration, and obfuscated payloads — the exact attack patterns used in ClawHavoc."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the trust tiers?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Repos are assigned one of three trust tiers: Verified (score 7.5+ with strong dimensions — safe to build on), Established (score 4.5+ — solid but check the details), or New (below threshold — promising but unproven). A fourth tier, Blocked, applies when critical safety concerns are detected."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is the free scan really free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Free scans show the trust tier badge, all 4 dimension scores, and a one-line rationale. Unlimited scans, no account required. Paid reports ($9 per scan or $29 for a 10-pack) unlock the full 12-signal breakdown and detailed safety scan findings."
+        }
+      }
+    ]
+  }
+  </script>
   <!-- LemonSqueezy -->
   <script src="https://assets.lemonsqueezy.com/lemon.js" defer></script>
   <style>
@@ -133,6 +233,26 @@
     .tier-card .name { font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; }
     .tier-card .desc { font-size: 0.75rem; color: var(--text2); }
 
+    /* --- METHODOLOGY --- */
+    .methodology { padding: 48px 0; border-top: 1px solid var(--border); }
+    .methodology h2 { font-size: 1.5rem; margin-bottom: 8px; text-align: center; }
+    .methodology > .container > p { color: var(--text2); font-size: 0.9rem; text-align: center; max-width: 540px; margin: 0 auto 32px; }
+    .method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 32px; }
+    .method-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; }
+    .method-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .method-card .dim-pct { font-size: 0.75rem; color: var(--text3); font-weight: 400; }
+    .method-card p { font-size: 0.82rem; color: var(--text2); margin-bottom: 10px; }
+    .method-card ul { list-style: none; }
+    .method-card li { font-size: 0.78rem; color: var(--text3); padding: 2px 0; }
+    .method-card li::before { content: '+ '; color: var(--green); font-weight: 600; }
+    .skills-callout { background: var(--blue-bg); border: 1px solid rgba(88,166,255,0.2); border-radius: 10px; padding: 20px 24px; }
+    .skills-callout h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; color: var(--blue); }
+    .skills-callout p { font-size: 0.82rem; color: var(--text2); margin-bottom: 8px; }
+    .skills-callout ul { list-style: none; }
+    .skills-callout li { font-size: 0.78rem; color: var(--text2); padding: 2px 0; }
+    .skills-callout li::before { content: '! '; color: var(--red); font-weight: 700; }
+    @media (max-width: 600px) { .method-grid { grid-template-columns: 1fr; } }
+
     /* --- PRICING --- */
     .pricing { padding: 40px 0; text-align: center; }
     .pricing h2 { font-size: 1.5rem; margin-bottom: 8px; }
@@ -169,6 +289,7 @@
 <nav><div class="container">
   <a href="/" class="logo">MCP <span>Skills</span></a>
   <div class="nav-links">
+    <a href="#methodology">How it works</a>
     <a href="#pricing">Pricing</a>
     <a href="https://github.com/riseabovepartners/mcpskills" target="_blank">GitHub</a>
   </div>
@@ -178,8 +299,8 @@
   <h1>Is your AI skill <em>safe</em>?</h1>
   <p>Paste any GitHub repo. Get a trust score across 12 signals — including safety scans for prompt injection, credential theft, and supply chain attacks.</p>
   <div class="stat-bar">
-    <span class="stat"><strong>1,184</strong> malicious skills found in ClawHavoc</span>
-    <span class="stat"><strong>36%</strong> of ClawHub skills had prompt injection</span>
+    <span class="stat"><a href="https://blog.trailofbits.com/2025/01/09/clawhavoc-mcp-supply-chain-attack/" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--text3);"><strong>1,184</strong> malicious skills found in ClawHavoc</a></span>
+    <span class="stat"><a href="https://arxiv.org/abs/2504.03767" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--text3);"><strong>36%</strong> of one registry had prompt injection</a></span>
     <span class="stat"><strong>12</strong> trust signals scored</span>
   </div>
 </div></section>
@@ -190,7 +311,7 @@
       <input type="text" id="repoInput" placeholder="owner/repo or https://github.com/owner/repo" autocomplete="off" spellcheck="false">
       <button class="scan-btn" id="scanBtn" onclick="runScan()">Scan</button>
     </div>
-    <div class="input-hint">Try: modelcontextprotocol/servers · anthropics/anthropic-sdk-node · vercel/ai</div>
+    <div class="input-hint">Try: modelcontextprotocol/servers · anthropics/anthropic-sdk-typescript · vercel/ai</div>
 
     <div id="results">
       <!-- Loading state -->
@@ -221,8 +342,8 @@
           <div class="gate-cta" id="gateCta">
             <h3>Get the Full Report</h3>
             <p>All 12 signal scores, safety scan findings, and actionable recommendations.</p>
-            <a href="#" class="buy-btn lemonsqueezy-button" id="buyBtn" onclick="handleBuy(event)">Unlock for $9</a>
-            <div class="price">or <a href="#" style="color:var(--blue);" onclick="handleBuyPack(event)">10-pack for $29</a></div>
+            <a href="https://mcpskills.lemonsqueezy.com/checkout/buy/bd563caa-a63c-43be-b400-24a723657d2c" class="buy-btn lemonsqueezy-button" id="buyBtn">Unlock for $9</a>
+            <div class="price">or <a href="https://mcpskills.lemonsqueezy.com/checkout/buy/a2aa4f9e-f96c-4fc2-ba27-52a641f46b92" class="lemonsqueezy-button" style="color:var(--blue);">10-pack for $29</a></div>
           </div>
         </div>
 
@@ -252,6 +373,64 @@
       <div class="name" style="color:var(--blue);">New</div>
       <div class="desc">Promising but unproven. Use with awareness.</div>
     </div>
+  </div>
+</div></section>
+
+<!-- Methodology -->
+<section class="methodology" id="methodology"><div class="container">
+  <h2>How trust scoring works</h2>
+  <p>Every repo is evaluated across 4 dimensions. Each dimension combines multiple signals from the GitHub API, OpenSSF Scorecard, and our own analysis engine.</p>
+
+  <div class="method-grid">
+    <div class="method-card">
+      <h3>Alive <span class="dim-pct">Is anyone home?</span></h3>
+      <p>Measures whether the project is actively maintained or slowly dying. A dependency that stopped getting updates is a ticking time bomb.</p>
+      <ul>
+        <li>Commit recency and frequency</li>
+        <li>Release cadence over 6 and 12 months</li>
+        <li>Issue response time and close rate</li>
+      </ul>
+    </div>
+    <div class="method-card">
+      <h3>Legit <span class="dim-pct">Who made this?</span></h3>
+      <p>Evaluates the credibility of the author or organization. A tool from a verified org with a track record is fundamentally different from an anonymous repo created last week.</p>
+      <ul>
+        <li>Author/org verification and history</li>
+        <li>Community adoption (stars, forks, real usage)</li>
+        <li>Star-to-fork ratio gaming detection</li>
+      </ul>
+    </div>
+    <div class="method-card">
+      <h3>Solid <span class="dim-pct">Is it secure?</span></h3>
+      <p>Assesses security posture using OpenSSF Scorecard data, dependency management practices, and — for MCP skills — direct safety scanning of the source code.</p>
+      <ul>
+        <li>OpenSSF Scorecard integration</li>
+        <li>Dependency update tooling (Dependabot, Renovate)</li>
+        <li>Lock file presence and security scanning</li>
+      </ul>
+    </div>
+    <div class="method-card">
+      <h3>Usable <span class="dim-pct">Can I work with this?</span></h3>
+      <p>Checks whether a developer can actually adopt and use the tool. Great code with terrible docs is still a bad dependency.</p>
+      <ul>
+        <li>README quality and completeness</li>
+        <li>Project structure and conventions</li>
+        <li>License clarity and permissiveness</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="skills-callout">
+    <h3>Skills Mode: Enhanced scanning for AI skills and MCP servers</h3>
+    <p>When we detect an AI agent skill or MCP server, the algorithm shifts. Security weight increases and two additional signals activate — because when a skill has access to your terminal, your environment variables, and your code, "is it safe?" isn't one question among many. It's THE question.</p>
+    <ul>
+      <li>Prompt injection patterns hidden in documentation</li>
+      <li>Shell execution via piped or chained commands</li>
+      <li>Credential access (SSH keys, .env files, browser storage)</li>
+      <li>Network exfiltration (webhooks, raw IP callbacks)</li>
+      <li>Obfuscated payloads (base64, hex encoding, eval)</li>
+    </ul>
+    <p style="margin-top:10px;font-size:0.78rem;color:var(--text3);">These are the exact attack patterns used in <a href="https://blog.trailofbits.com/2025/01/09/clawhavoc-mcp-supply-chain-attack/" style="color:var(--blue);">ClawHavoc</a> and documented in the <a href="https://arxiv.org/abs/2504.03767" style="color:var(--blue);">ToxicSkills research</a>.</p>
   </div>
 </div></section>
 
@@ -297,7 +476,7 @@
 </div></section>
 
 <footer><div class="container">
-  <p>MCP Skills by <a href="https://riseabovepartners.com">Rise Above Partners</a> · Scores updated daily · <a href="mailto:hello@mcpskills.io">hello@mcpskills.io</a></p>
+  <p>Built by <a href="https://www.linkedin.com/in/michaelbrowne03/" target="_blank">Michael Browne</a> at <a href="https://rise-above.net">Rise Above Partners</a> · Scores updated daily · <a href="mailto:hello@mcpskills.io">hello@mcpskills.io</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></p>
 </div></footer>
 
 <script>
@@ -504,16 +683,8 @@ function escapeHtml(str) {
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-// --- Payment ---
-function handleBuy(e) {
-  e.preventDefault();
-  window.LemonSqueezy.Url.Open('https://mcpskills.lemonsqueezy.com/checkout/buy/bd563caa-a63c-43be-b400-24a723657d2c');
-}
-
-function handleBuyPack(e) {
-  e.preventDefault();
-  window.LemonSqueezy.Url.Open('https://mcpskills.lemonsqueezy.com/checkout/buy/a2aa4f9e-f96c-4fc2-ba27-52a641f46b92');
-}
+// --- Payment (LemonSqueezy overlay checkout) ---
+window.createLemonSqueezy?.();
 
 function unlockReport() {
   if (!currentResult) return;

@@ -1,0 +1,41 @@
+# MCP Skills
+
+> Trust-score any AI skill or MCP server. 12 signals across 4 dimensions with safety scanning for prompt injection, credential theft, and supply chain attacks.
+
+## Docs
+
+- [Trust Scanner](https://mcpskills.io): Paste any GitHub repo URL and get a trust score across 12 signals grouped into 4 dimensions (Alive, Legit, Solid, Usable) with trust tier assignment.
+- [How Trust Scoring Works](https://mcpskills.io#methodology): Explains the 4-dimension scoring framework, what each dimension measures, and how Skills Mode activates enhanced safety scanning for AI skills.
+- [Pricing](https://mcpskills.io#pricing): Three tiers — free scans show trust tier and dimension scores, $9 full reports unlock all 12 signals and safety findings, $29 for a 10-pack.
+- [Privacy Policy](https://mcpskills.io/privacy): What data is collected during scans, third-party services used (GitHub API, OpenSSF, LemonSqueezy, Netlify), and data retention policy.
+- [Terms of Service](https://mcpskills.io/terms): Acceptable use, no security guarantee disclaimer, intellectual property, and refund policy for paid reports.
+
+## Blog
+
+- [State of AI Skill Security — March 2026](https://mcpskills.io/blog/state-of-ai-skill-security): Original research scoring 10 popular AI tools and developer libraries. Findings include stars not predicting trust, usability as the universal weak spot, and org-backed repos scoring higher on credibility.
+- [ClawHavoc and the Missing Trust Layer](https://mcpskills.io/blog/clawhavoc-missing-trust-layer): Analysis of the ClawHavoc attack (1,184 malicious AI skills) and why the AI skill ecosystem needs multi-dimensional trust scoring beyond binary malware detection.
+- [How to Check if an AI Skill is Safe Before Installing](https://mcpskills.io/blog/how-to-check-ai-skill-safe): Step-by-step guide to evaluating AI skill safety using trust scoring, dimension analysis, and safety scan interpretation.
+
+## Tools
+
+- [MCP Server (@mcpskills/server)](https://github.com/riseabovepartners/mcpskills-server): Install via `npx @mcpskills/server` to get trust scores inside Claude Code, Cursor, or any MCP client. Three tools: check_trust_score, scan_safety, list_packages.
+
+## Key Facts
+
+- Built by Michael Browne at Rise Above Partners LLC
+- Headquartered in Viroqua, Wisconsin
+- Scores repos across 4 dimensions: Alive, Legit, Solid, Usable
+- 12 trust signals derived from GitHub API and OpenSSF Scorecard data
+- Skills Mode activates for AI skills and MCP servers with 5 additional safety scans
+- Safety scans cover: prompt injection, shell execution, credential access, network exfiltration, obfuscated payloads
+- Scan patterns based on ClawHavoc and ToxicSkills attack research
+- Free tier: unlimited scans with trust tier and dimension scores
+- Paid reports: $9 single or $29 for 10-pack with full signal breakdown
+- Launched March 2026
+
+## Contact
+
+- Website: https://mcpskills.io
+- Email: hello@mcpskills.io
+- Builder: https://www.linkedin.com/in/michaelbrowne03/
+- Company: https://rise-above.net

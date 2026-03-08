@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClawHavoc and the Missing Trust Layer | MCP Skills</title>
+  <meta name="description" content="1,184 malicious AI skills. 7,700 downloads before detection. ClawHavoc exposed the missing trust layer in the AI skill ecosystem. Here's what we're doing about it.">
+  <meta property="og:title" content="ClawHavoc and the Missing Trust Layer">
+  <meta property="og:description" content="1,184 malicious AI skills. 7,700 downloads before detection. The AI skill ecosystem has no trust layer. Here's what we're building.">
+  <meta property="og:url" content="https://mcpskills.io/blog/clawhavoc-missing-trust-layer">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://mcpskills.io/blog/clawhavoc-missing-trust-layer">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "ClawHavoc and the Missing Trust Layer",
+    "description": "1,184 malicious AI skills were found on a major agent marketplace. Here's why the AI skill ecosystem needs a trust layer.",
+    "datePublished": "2026-03-08",
+    "dateModified": "2026-03-08",
+    "author": {
+      "@type": "Person",
+      "name": "Michael Browne",
+      "url": "https://www.linkedin.com/in/michaelbrowne03/",
+      "jobTitle": "Founder",
+      "worksFor": { "@type": "Organization", "name": "Rise Above Partners LLC" }
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "MCP Skills",
+      "url": "https://mcpskills.io"
+    },
+    "mainEntityOfPage": "https://mcpskills.io/blog/clawhavoc-missing-trust-layer"
+  }
+  </script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0D1117; --surface: #161B22;
+      --border: #30363D;
+      --text: #E6EDF3; --text2: #8B949E; --text3: #6E7681;
+      --green: #3FB950; --blue: #58A6FF; --yellow: #E3B341; --red: #F85149;
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; line-height: 1.7; }
+    .container { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+    nav { padding: 16px 0; border-bottom: 1px solid var(--border); }
+    nav .container { display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 1.1rem; font-weight: 700; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--green); }
+    .nav-links { display: flex; gap: 20px; }
+    .nav-links a { color: var(--text2); text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+    .nav-links a:hover { color: var(--text); }
+
+    article { padding: 48px 0 64px; }
+    article h1 { font-size: 2rem; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.03em; line-height: 1.2; }
+    .meta { font-size: 0.82rem; color: var(--text3); margin-bottom: 32px; }
+    .meta a { color: var(--blue); text-decoration: none; }
+    article h2 { font-size: 1.25rem; font-weight: 600; margin: 36px 0 12px; color: var(--text); }
+    article p { font-size: 0.92rem; color: var(--text2); margin-bottom: 16px; }
+    article a { color: var(--blue); }
+    article strong { color: var(--text); }
+    article blockquote { border-left: 3px solid var(--green); padding: 12px 16px; margin: 20px 0; background: var(--surface); border-radius: 0 8px 8px 0; }
+    article blockquote p { margin: 0; font-style: italic; }
+    article ul { list-style: none; margin-bottom: 16px; }
+    article li { font-size: 0.88rem; color: var(--text2); padding: 4px 0 4px 20px; position: relative; }
+    article li::before { content: '→'; position: absolute; left: 0; color: var(--green); }
+
+    .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+    .comparison-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+    .comparison-box h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; }
+    .comparison-box p { font-size: 0.82rem; margin-bottom: 6px; }
+    .comparison-good { border-color: var(--green); }
+    .comparison-bad { border-color: var(--red); }
+
+    .cta-box { background: linear-gradient(135deg, rgba(63,185,80,0.1), rgba(88,166,255,0.1)); border: 1px solid var(--green); border-radius: 10px; padding: 24px; margin: 32px 0; text-align: center; }
+    .cta-box p { margin-bottom: 12px; }
+    .cta-btn { display: inline-block; background: var(--green); color: #000; font-weight: 600; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-size: 0.9rem; }
+    .cta-btn:hover { opacity: 0.9; }
+
+    footer { padding: 32px 0; border-top: 1px solid var(--border); text-align: center; }
+    footer p { font-size: 0.78rem; color: var(--text3); }
+    footer a { color: var(--text2); }
+    @media (max-width: 600px) { .comparison { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<nav><div class="container">
+  <a href="/" class="logo">MCP <span>Skills</span></a>
+  <div class="nav-links">
+    <a href="/">Scanner</a>
+    <a href="/#methodology">How it works</a>
+    <a href="/blog/state-of-ai-skill-security">Research</a>
+  </div>
+</div></nav>
+
+<article><div class="container">
+
+  <h1>ClawHavoc and the Missing Trust Layer</h1>
+  <p class="meta">By <a href="https://www.linkedin.com/in/michaelbrowne03/">Michael Browne</a> &middot; March 8, 2026 &middot; 5 min read</p>
+
+  <p>In January 2026, security researchers discovered <a href="https://blog.trailofbits.com/2026/01/clawhavoc/" rel="nofollow">1,184 malicious AI skills</a> on a major agent marketplace. One trojan skill — disguised as a weather tool — was downloaded 7,700 times before anyone noticed.</p>
+
+  <p>It stole API keys. Crypto wallets. Browser credentials. All from developers who thought they were installing something harmless.</p>
+
+  <p>The attack was called ClawHavoc. And it worked because there's no trust layer for AI skills.</p>
+
+  <h2>The Gap Nobody Noticed</h2>
+
+  <p>Think about how you evaluate dependencies in the rest of the software stack:</p>
+
+  <div class="comparison">
+    <div class="comparison-box comparison-good">
+      <h3>npm package</h3>
+      <p>Downloads/week visible</p>
+      <p>Stars and forks on GitHub</p>
+      <p>Last publish date</p>
+      <p>Known vulnerability alerts</p>
+      <p>License clearly displayed</p>
+    </div>
+    <div class="comparison-box comparison-bad">
+      <h3>AI skill / MCP server</h3>
+      <p>A README you skimmed for 10 seconds</p>
+      <p>Maybe a star count</p>
+      <p>No security assessment</p>
+      <p>No quality score</p>
+      <p>No maintenance signal</p>
+    </div>
+  </div>
+
+  <p>When you install an npm package, you can check weekly downloads, open issues, last update, and known CVEs. When you install an AI skill into Claude Code or Cursor, you get a README and a promise.</p>
+
+  <p>And you're giving that skill access to your terminal, your code, your environment variables — permissions that npm packages rarely need.</p>
+
+  <h2>The Attack Surface Is Wider Than You Think</h2>
+
+  <p>A separate study, <a href="https://arxiv.org/abs/2504.08623" rel="nofollow">ToxicSkills (arXiv:2504.08623)</a>, found that <strong>36% of skills on one major registry contained detectable prompt injection patterns</strong>. Not sophisticated zero-days — patterns that static analysis could catch.</p>
+
+  <p>The five attack vectors researchers identified:</p>
+  <ul>
+    <li><strong>Prompt injection</strong> — hidden instructions in SKILL.md or README that override the AI agent's behavior</li>
+    <li><strong>Shell execution</strong> — piped commands (curl | sh) or eval() with network-fetched content</li>
+    <li><strong>Credential theft</strong> — reading SSH keys, AWS credentials, browser storage</li>
+    <li><strong>Network exfiltration</strong> — sending stolen data to Discord webhooks, Telegram bots, or raw IP addresses</li>
+    <li><strong>Obfuscated payloads</strong> — base64-encoded strings, hex sequences, or String.fromCharCode chains hiding malicious intent</li>
+  </ul>
+
+  <p>These aren't theoretical. They're the exact patterns used in ClawHavoc. And they're detectable — if anyone is looking.</p>
+
+  <h2>What Exists Today</h2>
+
+  <p>The ecosystem has registries (Anthropic's MCP Registry, Smithery, mcp.so) — they tell you what exists. Some have malware scanning — binary safe/unsafe checks.</p>
+
+  <p>But nobody built the trust layer. Nobody answers the multi-dimensional question: <strong>"Is this skill actively maintained? Is the author credible? Does it follow the spec? Is the README actually helpful? Are there hidden prompt injection patterns?"</strong></p>
+
+  <p>That gap is why ClawHavoc worked. Developers couldn't tell good skills from bad ones because there was no scoring system that combined security, maintenance, credibility, and usability into a single assessment.</p>
+
+  <h2>What We Built</h2>
+
+  <p><a href="https://mcpskills.io">mcpskills.io</a> scores AI skills across 12 signals, grouped into 4 dimensions:</p>
+  <ul>
+    <li><strong>Alive</strong> — Is it maintained? (commit recency, release cadence, issue response time)</li>
+    <li><strong>Legit</strong> — Who made it? (author credibility, community adoption)</li>
+    <li><strong>Solid</strong> — Is it safe? (OpenSSF Scorecard data, dependency health, 5 safety scans)</li>
+    <li><strong>Usable</strong> — Can I work with it? (README quality, spec compliance, license clarity)</li>
+  </ul>
+
+  <p>It assigns trust tiers — Verified, Established, New — so you know at a glance. For AI skills and MCP servers, it activates Skills Mode: security weight increases to 34% and 5 safety scans run against the exact attack patterns from ClawHavoc and ToxicSkills.</p>
+
+  <p>The data comes from the GitHub API and <a href="https://scorecard.dev">OpenSSF Scorecard</a>. No manual judgment. The same algorithm scores every repo identically.</p>
+
+  <blockquote>
+    <p>The MCP Registry was designed for downstream curators to add quality signals. This is that quality signal.</p>
+  </blockquote>
+
+  <h2>What Comes Next</h2>
+
+  <p>We're building this in public. Next steps:</p>
+  <ul>
+    <li>An <strong>MCP server</strong> that provides trust scores directly inside Claude Code and Cursor — so you never have to leave your IDE to check</li>
+    <li><strong>Curated skill packages</strong> — pre-vetted stacks organized by use case (full-stack dev, data research, DevOps)</li>
+    <li>A <strong>public API</strong> for CI/CD integration — block untrusted skills before they reach production</li>
+  </ul>
+
+  <p>If you care about AI agent security, I'd love to hear what you think. What signals matter most to you when evaluating a skill?</p>
+
+  <div class="cta-box">
+    <p><strong>Score your AI skills.</strong> Paste any GitHub repo URL and get a trust score in seconds.</p>
+    <a href="https://mcpskills.io" class="cta-btn">Scan Now — Free</a>
+  </div>
+
+</div></article>
+
+<footer><div class="container">
+  <p>Built by <a href="https://www.linkedin.com/in/michaelbrowne03/">Michael Browne</a> at <a href="https://rise-above.net">Rise Above Partners LLC</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="/terms">Terms</a></p>
+</div></footer>
+
+</body>
+</html>

@@ -4,6 +4,8 @@
 
 [functions]
   node_bundler = "esbuild"
+  external_node_modules = ["satori", "@resvg/resvg-js"]
+  included_files = ["lib/fonts/**"]
 
 # Environment variables (set in Netlify UI, not here):
 # GITHUB_TOKEN — personal access token for 5,000 req/hr

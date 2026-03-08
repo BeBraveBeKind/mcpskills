@@ -1,0 +1,36 @@
+{
+  "name": "@mcpskills/server",
+  "version": "1.0.0",
+  "description": "Trust-score any AI skill or MCP server from inside Claude Code, Cursor, or any MCP client. 12 signals across 4 dimensions with safety scanning.",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "mcpskills": "index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "trust-score",
+    "ai-skills",
+    "security",
+    "safety-scanner",
+    "claude-code",
+    "cursor"
+  ],
+  "author": "Michael Browne <hello@mcpskills.io> (https://mcpskills.io)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/riseabovepartners/mcpskills-server"
+  },
+  "homepage": "https://mcpskills.io",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0"
+  }
+}

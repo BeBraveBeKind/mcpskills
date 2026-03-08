@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service — MCP Skills</title>
+  <meta name="description" content="Terms of service for MCP Skills trust scanner.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0D1117; --surface: #161B22;
+      --border: #30363D;
+      --text: #E6EDF3; --text2: #8B949E; --text3: #6E7681;
+      --green: #3FB950; --blue: #58A6FF;
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; line-height: 1.7; }
+    .container { max-width: 680px; margin: 0 auto; padding: 0 20px; }
+    nav { padding: 16px 0; border-bottom: 1px solid var(--border); }
+    nav .container { display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 1.1rem; font-weight: 700; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--green); }
+    .nav-links { display: flex; gap: 20px; }
+    .nav-links a { color: var(--text2); text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+    .nav-links a:hover { color: var(--text); }
+    .content { padding: 48px 0 64px; }
+    .content h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.02em; }
+    .content .updated { font-size: 0.82rem; color: var(--text3); margin-bottom: 32px; }
+    .content h2 { font-size: 1.1rem; font-weight: 600; margin: 28px 0 10px; color: var(--text); }
+    .content p { font-size: 0.88rem; color: var(--text2); margin-bottom: 12px; }
+    .content ul { list-style: none; margin-bottom: 12px; }
+    .content li { font-size: 0.85rem; color: var(--text2); padding: 3px 0; padding-left: 16px; position: relative; }
+    .content li::before { content: '-'; position: absolute; left: 0; color: var(--text3); }
+    .content a { color: var(--blue); }
+    footer { padding: 32px 0; border-top: 1px solid var(--border); text-align: center; }
+    footer p { font-size: 0.78rem; color: var(--text3); }
+    footer a { color: var(--text2); }
+  </style>
+</head>
+<body>
+
+<nav><div class="container">
+  <a href="/" class="logo">MCP <span>Skills</span></a>
+  <div class="nav-links">
+    <a href="/">Scanner</a>
+    <a href="/privacy">Privacy</a>
+  </div>
+</div></nav>
+
+<section class="content"><div class="container">
+  <h1>Terms of Service</h1>
+  <p class="updated">Last updated: March 8, 2026</p>
+
+  <p>These terms govern your use of MCP Skills at mcpskills.io, operated by Rise Above Partners LLC ("we", "us"). By using the site, you agree to these terms.</p>
+
+  <h2>1. What MCP Skills does</h2>
+  <p>MCP Skills analyzes publicly available GitHub repository data to generate trust scores. These scores are informational and represent our algorithm's assessment at the time of scanning. They are not a guarantee of security, quality, or fitness for any purpose.</p>
+
+  <h2>2. Free and paid tiers</h2>
+  <p>Free scans provide a trust tier badge, dimension scores, and a brief rationale. Paid reports ($9 per scan or $29 for a 10-pack) unlock the full 12-signal breakdown, safety scan findings, and detailed analysis.</p>
+  <p>Payments are processed by LemonSqueezy. By purchasing a report, you also agree to <a href="https://www.lemonsqueezy.com/terms" target="_blank">LemonSqueezy's terms of service</a>.</p>
+
+  <h2>3. No security guarantee</h2>
+  <p>Trust scores are generated from automated analysis of public data. A high score does not mean a tool is free of vulnerabilities. A low score does not mean a tool is malicious. MCP Skills is a signal, not a verdict.</p>
+  <p>You are responsible for your own security decisions. We strongly recommend conducting your own review before installing any MCP server or AI agent skill into your development environment.</p>
+
+  <h2>4. Acceptable use</h2>
+  <p>You may use MCP Skills for evaluating open-source tools, auditing your own dependencies, and making informed decisions about software adoption. You may not:</p>
+  <ul>
+    <li>Use automated scripts to bulk-scan repos in a way that degrades service for others</li>
+    <li>Misrepresent MCP Skills scores as official security certifications</li>
+    <li>Use scan results to harass, defame, or attack open-source maintainers</li>
+    <li>Attempt to reverse-engineer the scoring algorithm through systematic probing</li>
+  </ul>
+
+  <h2>5. Intellectual property</h2>
+  <p>The MCP Skills scoring algorithm, methodology, and presentation are proprietary to Rise Above Partners LLC. Scan results for your own repos may be shared freely. You may reference scores publicly (e.g., "Scored 8.2/10 on MCP Skills") with attribution.</p>
+
+  <h2>6. Refunds</h2>
+  <p>If a paid report fails to generate due to a technical error on our end, we will issue a full refund or provide a replacement scan. Contact <a href="mailto:hello@mcpskills.io">hello@mcpskills.io</a> with your order details.</p>
+  <p>We do not offer refunds for reports that were successfully generated but where the score was lower or different than expected.</p>
+
+  <h2>7. Limitation of liability</h2>
+  <p>MCP Skills is provided "as is" without warranty of any kind. To the maximum extent permitted by law, Rise Above Partners LLC shall not be liable for any damages arising from your use of the service, including but not limited to decisions made based on trust scores.</p>
+
+  <h2>8. Changes to these terms</h2>
+  <p>We may update these terms as the product evolves. Continued use of MCP Skills after changes constitutes acceptance. Material changes will be noted with an updated date at the top of this page.</p>
+
+  <h2>9. Contact</h2>
+  <p>Questions? Email <a href="mailto:hello@mcpskills.io">hello@mcpskills.io</a>.</p>
+  <p>Rise Above Partners LLC<br>Viroqua, Wisconsin</p>
+
+</div></section>
+
+<footer><div class="container">
+  <p>Built by <a href="https://www.linkedin.com/in/michaelbrowne03/" target="_blank">Michael Browne</a> at <a href="https://rise-above.net">Rise Above Partners</a> · <a href="mailto:hello@mcpskills.io">hello@mcpskills.io</a></p>
+</div></footer>
+
+</body>
+</html>

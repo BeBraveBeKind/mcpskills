@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Check if an AI Skill is Safe Before Installing | MCP Skills</title>
+  <meta name="description" content="Step-by-step guide to checking if an AI skill or MCP server is safe. Learn what to look for, how to use trust scoring, and how to interpret the results.">
+  <meta property="og:title" content="How to Check if an AI Skill is Safe Before Installing">
+  <meta property="og:description" content="Step-by-step guide to evaluating AI skill safety. Trust scoring, safety scans, and what the results mean.">
+  <meta property="og:url" content="https://mcpskills.io/blog/how-to-check-ai-skill-safe">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://mcpskills.io/blog/how-to-check-ai-skill-safe">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Check if an AI Skill is Safe Before Installing",
+    "description": "Step-by-step guide to checking if an AI skill or MCP server is safe using trust scoring.",
+    "step": [
+      {
+        "@type": "HowToStep",
+        "name": "Find the GitHub repo URL",
+        "text": "Every AI skill and MCP server has source code hosted on GitHub. Find the repo URL — it's usually in the install instructions or marketplace listing."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Run the trust scan",
+        "text": "Go to mcpskills.io, paste the GitHub repo URL, and click Scan. The algorithm scores the repo across 12 signals in about 10 seconds."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Check the trust tier",
+        "text": "Look at the trust tier: Verified (7.5+), Established (4.5+), New (below 4.5), or Blocked (safety concern). Verified means strong scores across all 4 dimensions."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Review the dimension scores",
+        "text": "Check all 4 dimensions: Alive (maintained?), Legit (credible author?), Solid (secure?), Usable (good docs?). A high composite score with one weak dimension is a yellow flag."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Read the safety scan results",
+        "text": "For AI skills, the scanner runs 5 safety checks: prompt injection, shell execution, credential theft, network exfiltration, and obfuscated payloads. Any findings are flagged with file locations."
+      }
+    ],
+    "author": {
+      "@type": "Person",
+      "name": "Michael Browne",
+      "url": "https://www.linkedin.com/in/michaelbrowne03/"
+    }
+  }
+  </script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0D1117; --surface: #161B22;
+      --border: #30363D;
+      --text: #E6EDF3; --text2: #8B949E; --text3: #6E7681;
+      --green: #3FB950; --blue: #58A6FF; --yellow: #E3B341; --red: #F85149;
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; line-height: 1.7; }
+    .container { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+    nav { padding: 16px 0; border-bottom: 1px solid var(--border); }
+    nav .container { display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 1.1rem; font-weight: 700; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--green); }
+    .nav-links { display: flex; gap: 20px; }
+    .nav-links a { color: var(--text2); text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+    .nav-links a:hover { color: var(--text); }
+
+    article { padding: 48px 0 64px; }
+    article h1 { font-size: 1.9rem; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.03em; line-height: 1.2; }
+    .meta { font-size: 0.82rem; color: var(--text3); margin-bottom: 32px; }
+    .meta a { color: var(--blue); text-decoration: none; }
+    article h2 { font-size: 1.25rem; font-weight: 600; margin: 36px 0 12px; color: var(--text); }
+    article p { font-size: 0.92rem; color: var(--text2); margin-bottom: 16px; }
+    article a { color: var(--blue); }
+    article strong { color: var(--text); }
+
+    .step { display: flex; gap: 16px; margin: 24px 0; padding: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+    .step-num { background: var(--green); color: #000; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+    .step-content h3 { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
+    .step-content p { font-size: 0.88rem; margin-bottom: 8px; }
+    .step-content code { background: rgba(88,166,255,0.1); color: var(--blue); padding: 2px 6px; border-radius: 4px; font-size: 0.82rem; }
+
+    .tier-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.85rem; }
+    .tier-table th { text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--border); color: var(--text); font-weight: 600; }
+    .tier-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text2); }
+
+    .warning-box { background: rgba(248,81,73,0.08); border: 1px solid var(--red); border-radius: 10px; padding: 20px; margin: 20px 0; }
+    .warning-box h3 { color: var(--red); font-size: 0.95rem; margin-bottom: 8px; }
+    .warning-box p { font-size: 0.85rem; }
+    .warning-box ul { list-style: none; margin: 8px 0; }
+    .warning-box li { font-size: 0.85rem; color: var(--text2); padding: 3px 0 3px 20px; position: relative; }
+    .warning-box li::before { content: '⚠'; position: absolute; left: 0; }
+
+    .tip-box { background: rgba(63,185,80,0.08); border: 1px solid var(--green); border-radius: 10px; padding: 20px; margin: 20px 0; }
+    .tip-box h3 { color: var(--green); font-size: 0.95rem; margin-bottom: 8px; }
+    .tip-box p { font-size: 0.85rem; }
+
+    .cta-box { background: linear-gradient(135deg, rgba(63,185,80,0.1), rgba(88,166,255,0.1)); border: 1px solid var(--green); border-radius: 10px; padding: 24px; margin: 32px 0; text-align: center; }
+    .cta-box p { margin-bottom: 12px; }
+    .cta-btn { display: inline-block; background: var(--green); color: #000; font-weight: 600; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-size: 0.9rem; }
+    .cta-btn:hover { opacity: 0.9; }
+
+    .faq { margin: 24px 0; }
+    .faq-item { border-bottom: 1px solid var(--border); padding: 16px 0; }
+    .faq-q { font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .faq-a { font-size: 0.85rem; color: var(--text2); }
+
+    footer { padding: 32px 0; border-top: 1px solid var(--border); text-align: center; }
+    footer p { font-size: 0.78rem; color: var(--text3); }
+    footer a { color: var(--text2); }
+  </style>
+</head>
+<body>
+
+<nav><div class="container">
+  <a href="/" class="logo">MCP <span>Skills</span></a>
+  <div class="nav-links">
+    <a href="/">Scanner</a>
+    <a href="/#methodology">How it works</a>
+    <a href="/blog/state-of-ai-skill-security">Research</a>
+  </div>
+</div></nav>
+
+<article><div class="container">
+
+  <h1>How to Check if an AI Skill is Safe Before Installing</h1>
+  <p class="meta">By <a href="https://www.linkedin.com/in/michaelbrowne03/">Michael Browne</a> &middot; March 8, 2026 &middot; 5 min read</p>
+
+  <p>You found an AI skill or MCP server you want to install. Maybe it was recommended on Reddit, listed on Smithery, or came up in a Claude Code conversation. Before you give it access to your terminal, code, and environment variables — here's how to check if it's safe.</p>
+
+  <h2>Why This Matters</h2>
+
+  <p>AI skills and MCP servers run with permissions most npm packages never get. They can execute shell commands, read files, access environment variables, and make network requests. A malicious skill can steal credentials, exfiltrate data, or inject instructions that override your AI agent's behavior.</p>
+
+  <p>In January 2026, the <a href="https://blog.trailofbits.com/2026/01/clawhavoc/" rel="nofollow">ClawHavoc attack</a> planted 1,184 malicious skills on a major marketplace. One trojan was downloaded 7,700 times. Research from <a href="https://arxiv.org/abs/2504.08623" rel="nofollow">ToxicSkills</a> found 36% of skills on one major registry contained prompt injection patterns.</p>
+
+  <p>Checking takes 30 seconds. Cleaning up after a compromise takes days.</p>
+
+  <h2>Step-by-Step: Evaluate Any AI Skill</h2>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h3>Find the GitHub Repo URL</h3>
+      <p>Every legitimate AI skill has source code on GitHub (or GitLab/similar). The repo URL is usually in the install instructions or marketplace listing. If a skill has no public source code, that's a red flag — do not install it.</p>
+      <p>Copy the URL. It looks like: <code>https://github.com/owner/repo-name</code></p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h3>Run the Trust Scan</h3>
+      <p>Go to <a href="https://mcpskills.io">mcpskills.io</a> and paste the GitHub repo URL into the scanner. Click <strong>Scan</strong>.</p>
+      <p>The algorithm pulls data from the GitHub API and <a href="https://scorecard.dev">OpenSSF Scorecard</a>, scores 12 signals, and returns results in about 10 seconds. No sign-up required.</p>
+      <p>If the repo is detected as an AI skill or MCP server, the scanner automatically activates <strong>Skills Mode</strong> — increasing security weight and running 5 additional safety scans.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <h3>Check the Trust Tier</h3>
+      <p>The scan returns one of four trust tiers:</p>
+      <table class="tier-table">
+        <tr><th>Tier</th><th>Score</th><th>What It Means</th></tr>
+        <tr><td style="color:var(--green);font-weight:600;">Verified</td><td>7.5+</td><td>Strong scores across all 4 dimensions. Safe to build on.</td></tr>
+        <tr><td style="color:var(--yellow);font-weight:600;">Established</td><td>4.5+</td><td>Solid overall but check specific weak dimensions before relying on it.</td></tr>
+        <tr><td style="color:var(--text3);">New</td><td>&lt;4.5</td><td>Insufficient data or weak signals. Use with caution — verify manually.</td></tr>
+        <tr><td style="color:var(--red);font-weight:600;">Blocked</td><td>—</td><td>Safety scan detected confirmed threat patterns. Do not install.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <h3>Review the 4 Dimensions</h3>
+      <p>Don't just look at the composite score. Check each dimension individually:</p>
+      <p><strong>Alive</strong> (Is it maintained?) — Low score means slow issue response, no recent commits, or stale releases. A tool that's trending toward abandonment is a risk even if it's popular.</p>
+      <p><strong>Legit</strong> (Is the author credible?) — Verified organizations score higher. Solo developers with no track record score lower. Community adoption (stars + forks) also factors in.</p>
+      <p><strong>Solid</strong> (Is it secure?) — OpenSSF Scorecard data, dependency management (Dependabot/Renovate), and for AI skills: safety scan results for all 5 threat patterns.</p>
+      <p><strong>Usable</strong> (Can I work with it?) — README quality, spec compliance, license clarity. A tool with no install instructions or undocumented tools is harder to use safely.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <h3>Read the Safety Scan Results (AI Skills Only)</h3>
+      <p>For repos detected as AI skills, the scanner runs 5 safety checks based on real attack patterns:</p>
+      <p><strong>Prompt injection</strong> — Hidden instructions in SKILL.md or README that could override your AI agent</p>
+      <p><strong>Shell execution</strong> — Piped commands (curl | sh) or eval() with network content</p>
+      <p><strong>Credential theft</strong> — Code that reads SSH keys, AWS credentials, or browser storage</p>
+      <p><strong>Network exfiltration</strong> — Discord webhooks, Telegram bots, raw IP addresses used as data sinks</p>
+      <p><strong>Obfuscated payloads</strong> — Base64 strings, hex sequences, or String.fromCharCode chains hiding intent</p>
+      <p>Any findings are flagged with the specific file and code snippet. Unlock the full report ($9) to see every finding in detail.</p>
+    </div>
+  </div>
+
+  <h2>Red Flags to Watch For</h2>
+
+  <div class="warning-box">
+    <h3>Do Not Install If:</h3>
+    <ul>
+      <li>Trust tier is <strong>Blocked</strong> — confirmed threat patterns detected</li>
+      <li>No public source code — closed-source skills can't be audited</li>
+      <li>Alive dimension is below 3.0 — likely abandoned, won't get security patches</li>
+      <li>Safety scan found prompt injection — the skill may override your AI agent's instructions</li>
+      <li>Author has no other repos and account was created recently — possible throwaway</li>
+      <li>The skill requests permissions it shouldn't need (a "weather tool" reading SSH keys)</li>
+    </ul>
+  </div>
+
+  <div class="tip-box">
+    <h3>Good Signs</h3>
+    <p>Verified trust tier. Org-backed author. Active issue response (&lt;7 days). Clean safety scan. Clear license (MIT/Apache). Comprehensive README with install instructions and examples.</p>
+  </div>
+
+  <h2>What About Skills Not on GitHub?</h2>
+
+  <p>mcpskills.io currently scores repos hosted on GitHub. If a skill's source code is hosted elsewhere (GitLab, Bitbucket, self-hosted), you can still apply the same framework manually:</p>
+
+  <p>Check commit recency (last 30 days?). Check if issues get responses. Look at the author's profile and other projects. Search the code for the 5 safety patterns. Read the README for install instructions, license, and documentation quality.</p>
+
+  <p>If the skill has no public source code at all, treat it as untrusted by default.</p>
+
+  <h2>Scan From Your IDE</h2>
+
+  <p>Don't want to leave your editor? Install the mcpskills MCP server and score repos directly inside Claude Code or Cursor:</p>
+
+  <p><code>claude mcp add mcpskills -- npx @mcpskills/server</code></p>
+
+  <p>Then ask: <em>"Is modelcontextprotocol/servers safe?"</em> — and get a trust score without switching windows.</p>
+
+  <h2>FAQ</h2>
+
+  <div class="faq">
+    <div class="faq-item">
+      <div class="faq-q">How long does a scan take?</div>
+      <div class="faq-a">About 10 seconds. The algorithm fetches data from GitHub API and OpenSSF Scorecard in parallel.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Is scanning free?</div>
+      <div class="faq-a">Yes. Free scans show the trust tier and 4 dimension scores. Full reports (all 12 signals + safety findings) are $9, or $29 for a 10-pack.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Does a "Verified" tier guarantee safety?</div>
+      <div class="faq-a">No. Trust scoring is an assessment based on available signals, not a security guarantee. A Verified score means strong signals across all dimensions, but no automated tool can catch every possible threat. Always review permissions before installing.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Can I score private repos?</div>
+      <div class="faq-a">Not currently. mcpskills.io only scores public GitHub repos using the public GitHub API.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What's the difference between Standard Mode and Skills Mode?</div>
+      <div class="faq-a">Skills Mode activates when the scanner detects an AI skill or MCP server (via SKILL.md, server.json, or MCP metadata). It increases security weight to 34% and adds 5 safety scans. Standard Mode uses balanced weights and scores 10 signals without safety scanning.</div>
+    </div>
+  </div>
+
+  <div class="cta-box">
+    <p><strong>Check before you install.</strong> Paste any GitHub repo URL and get a trust score in 10 seconds.</p>
+    <a href="https://mcpskills.io" class="cta-btn">Scan Now — Free</a>
+  </div>
+
+</div></article>
+
+<footer><div class="container">
+  <p>Built by <a href="https://www.linkedin.com/in/michaelbrowne03/">Michael Browne</a> at <a href="https://rise-above.net">Rise Above Partners LLC</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="/terms">Terms</a></p>
+</div></footer>
+
+</body>
+</html>
