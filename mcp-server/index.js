@@ -352,7 +352,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case "list_packages": {
-        const packages = await fetchPackages();
+        const raw = await fetchPackages();
+        const packages = raw.packages || raw;
         const filter = args.package_name?.toLowerCase();
 
         let filtered = packages;
@@ -378,12 +379,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const lines = ["# MCP Skills — Curated Packages", ""];
         for (const pkg of filtered) {
           lines.push(`## ${pkg.name}`);
-          lines.push(pkg.description);
+          lines.push(pkg.tagline || pkg.description || "");
           lines.push("");
-          for (const skill of pkg.skills) {
-            lines.push(
-              `  - **${skill.name}** (${skill.repo}) — ${skill.description}`
-            );
+          const items = pkg.skills || pkg.repos || [];
+          for (const item of items) {
+            const name = item.name || `${item.owner}/${item.repo}`;
+            const desc = item.description || item.role || "";
+            lines.push(`  - **${name}** — ${desc}`);
           }
           lines.push("");
         }
