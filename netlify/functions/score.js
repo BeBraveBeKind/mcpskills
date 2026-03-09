@@ -7,6 +7,7 @@
  */
 
 const { scoreRepo } = require('../../lib/scorer');
+const { recommend } = require('../../lib/recommender');
 
 exports.handler = async (event) => {
   const headers = {
@@ -63,6 +64,13 @@ exports.handler = async (event) => {
         headers,
         body: JSON.stringify({ error: result.error }),
       };
+    }
+
+    // Attach recommendations
+    try {
+      result.recommendations = recommend(owner, repo, result);
+    } catch {
+      result.recommendations = null;
     }
 
     return {

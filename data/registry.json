@@ -1,0 +1,116 @@
+{
+  "categories": {
+    "ai-sdk": {
+      "name": "AI SDK & LLM Tools",
+      "keywords": ["ai", "llm", "gpt", "claude", "anthropic", "openai", "langchain", "agent", "embedding", "vector", "rag", "prompt"],
+      "repos": [
+        { "owner": "vercel", "repo": "ai", "label": "Multi-provider AI SDK" },
+        { "owner": "anthropics", "repo": "anthropic-sdk-typescript", "label": "Official Anthropic SDK" },
+        { "owner": "anthropics", "repo": "anthropic-sdk-python", "label": "Official Anthropic Python SDK" },
+        { "owner": "langchain-ai", "repo": "langchainjs", "label": "LangChain for JS" },
+        { "owner": "langchain-ai", "repo": "langchain", "label": "LangChain for Python" },
+        { "owner": "openai", "repo": "openai-node", "label": "Official OpenAI SDK" },
+        { "owner": "chroma-core", "repo": "chroma", "label": "Vector database" },
+        { "owner": "promptfoo", "repo": "promptfoo", "label": "Prompt testing & eval" }
+      ]
+    },
+    "mcp-server": {
+      "name": "MCP Servers & Protocol",
+      "keywords": ["mcp", "model-context-protocol", "mcp-server", "modelcontextprotocol", "tool-server", "stdio"],
+      "repos": [
+        { "owner": "modelcontextprotocol", "repo": "servers", "label": "Official MCP reference servers" },
+        { "owner": "modelcontextprotocol", "repo": "typescript-sdk", "label": "Official MCP TypeScript SDK" },
+        { "owner": "modelcontextprotocol", "repo": "python-sdk", "label": "Official MCP Python SDK" },
+        { "owner": "punkpeye", "repo": "awesome-mcp-servers", "label": "Curated MCP server list" }
+      ]
+    },
+    "database": {
+      "name": "Database & ORM",
+      "keywords": ["database", "db", "orm", "sql", "postgres", "mysql", "sqlite", "mongo", "prisma", "drizzle", "supabase", "knex", "sequelize"],
+      "repos": [
+        { "owner": "prisma", "repo": "prisma", "label": "Type-safe ORM" },
+        { "owner": "drizzle-team", "repo": "drizzle-orm", "label": "Lightweight TypeScript ORM" },
+        { "owner": "supabase", "repo": "supabase-js", "label": "Supabase client (Postgres + auth)" },
+        { "owner": "knex", "repo": "knex", "label": "SQL query builder" },
+        { "owner": "typeorm", "repo": "typeorm", "label": "TypeScript ORM" }
+      ]
+    },
+    "auth": {
+      "name": "Authentication & Security",
+      "keywords": ["auth", "authentication", "login", "oauth", "jwt", "session", "passport", "clerk", "lucia", "security", "rbac"],
+      "repos": [
+        { "owner": "nextauthjs", "repo": "next-auth", "label": "Auth for Next.js (Auth.js)" },
+        { "owner": "clerk", "repo": "javascript", "label": "Managed auth with UI" },
+        { "owner": "panva", "repo": "jose", "label": "JWT/JWS/JWE implementation" },
+        { "owner": "lucia-auth", "repo": "lucia", "label": "Minimal auth library" },
+        { "owner": "arcjet", "repo": "arcjet-js", "label": "Rate limiting & bot protection" }
+      ]
+    },
+    "payments": {
+      "name": "Payments & Billing",
+      "keywords": ["payment", "stripe", "billing", "checkout", "subscription", "invoice", "lemon", "paddle"],
+      "repos": [
+        { "owner": "stripe", "repo": "stripe-node", "label": "Stripe Node SDK" },
+        { "owner": "stripe", "repo": "react-stripe-js", "label": "Stripe React components" },
+        { "owner": "lmsqueezy", "repo": "lemonsqueezy.js", "label": "LemonSqueezy SDK" }
+      ]
+    },
+    "ui": {
+      "name": "UI Components & Design",
+      "keywords": ["ui", "component", "design", "shadcn", "radix", "headless", "tailwind", "css", "animation", "motion"],
+      "repos": [
+        { "owner": "shadcn-ui", "repo": "ui", "label": "Copy-paste UI components" },
+        { "owner": "radix-ui", "repo": "primitives", "label": "Headless UI primitives" },
+        { "owner": "motiondivision", "repo": "motion", "label": "Animation library" },
+        { "owner": "react-hook-form", "repo": "react-hook-form", "label": "Performant forms" }
+      ]
+    },
+    "email": {
+      "name": "Email & Messaging",
+      "keywords": ["email", "smtp", "mail", "resend", "sendgrid", "nodemailer", "notification", "push"],
+      "repos": [
+        { "owner": "resend", "repo": "resend-node", "label": "Modern email API" },
+        { "owner": "resend", "repo": "react-email", "label": "Email templates with React" },
+        { "owner": "nodemailer", "repo": "nodemailer", "label": "SMTP email sending" }
+      ]
+    },
+    "testing": {
+      "name": "Testing & Quality",
+      "keywords": ["test", "testing", "jest", "vitest", "playwright", "cypress", "e2e", "unit", "lint", "eslint"],
+      "repos": [
+        { "owner": "vitest-dev", "repo": "vitest", "label": "Fast unit testing" },
+        { "owner": "microsoft", "repo": "playwright", "label": "Cross-browser E2E testing" },
+        { "owner": "cypress-io", "repo": "cypress", "label": "E2E testing framework" },
+        { "owner": "eslint", "repo": "eslint", "label": "JavaScript linter" }
+      ]
+    },
+    "devops": {
+      "name": "DevOps & Infrastructure",
+      "keywords": ["deploy", "docker", "ci", "cd", "infrastructure", "monitoring", "logging", "kubernetes", "terraform"],
+      "repos": [
+        { "owner": "pulumi", "repo": "pulumi", "label": "Infrastructure as code" },
+        { "owner": "open-telemetry", "repo": "opentelemetry-js", "label": "Observability SDK" }
+      ]
+    },
+    "web-framework": {
+      "name": "Web Frameworks",
+      "keywords": ["next", "nextjs", "express", "fastify", "hono", "framework", "server", "api", "rest", "graphql"],
+      "repos": [
+        { "owner": "vercel", "repo": "next.js", "label": "React framework" },
+        { "owner": "honojs", "repo": "hono", "label": "Lightweight web framework" },
+        { "owner": "fastify", "repo": "fastify", "label": "Fast Node.js framework" },
+        { "owner": "expressjs", "repo": "express", "label": "Minimal Node.js framework" }
+      ]
+    },
+    "validation": {
+      "name": "Validation & Schema",
+      "keywords": ["validation", "schema", "zod", "joi", "yup", "ajv", "typebox"],
+      "repos": [
+        { "owner": "colinhacks", "repo": "zod", "label": "TypeScript-first schema validation" },
+        { "owner": "ajv-validator", "repo": "ajv", "label": "JSON Schema validator" }
+      ]
+    }
+  },
+  "version": "1.0.0",
+  "lastUpdated": "2026-03-09"
+}

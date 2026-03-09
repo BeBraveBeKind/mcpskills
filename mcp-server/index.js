@@ -68,6 +68,32 @@ function formatDimensions(dims) {
   ].join("\n");
 }
 
+function formatRecommendations(recs) {
+  if (!recs || (!recs.alternatives?.length && !recs.crossCategory?.length)) return [];
+
+  const lines = ["", "## Recommendations"];
+
+  if (recs.alternatives?.length > 0) {
+    lines.push("");
+    lines.push(`**Alternatives in ${recs.categories?.[0]?.name || "this category"}:**`);
+    for (const alt of recs.alternatives) {
+      const scoreStr = alt.score ? ` — ${alt.score}/10 ${alt.tier ? formatTier(alt.tier) : ""}` : " — not yet scored";
+      lines.push(`  → **${alt.repo}** (${alt.label})${scoreStr}`);
+    }
+  }
+
+  if (recs.crossCategory?.length > 0) {
+    lines.push("");
+    lines.push("**You might also need:**");
+    for (const sug of recs.crossCategory) {
+      const scoreStr = sug.score ? ` (${sug.score}/10)` : "";
+      lines.push(`  → **${sug.repo}**${scoreStr} — ${sug.label} (${sug.reason})`);
+    }
+  }
+
+  return lines;
+}
+
 function formatFreeResult(data) {
   const lines = [
     `# Trust Score: ${data.repo}`,
@@ -88,10 +114,15 @@ function formatFreeResult(data) {
     lines.push(`  Safety: ${data.skill.safety?.summary || "Not scanned"}`);
   }
 
+  // Recommendations
+  if (data.recommendations) {
+    lines.push(...formatRecommendations(data.recommendations));
+  }
+
   lines.push(
     "",
     "---",
-    "🔒 Full report (all 12 signals + safety findings) → https://mcpskills.io",
+    "🔒 Full report (all signals + safety findings) → https://mcpskills.io",
     "Set MCPSKILLS_API_KEY for full reports in-context."
   );
 
@@ -118,6 +149,8 @@ function formatFullResult(data) {
     issue_responsiveness: "Issue Response",
     author_credibility: "Author Credibility",
     community_adoption: "Community Adoption",
+    contributor_diversity: "Contributor Diversity",
+    download_adoption: "Download Adoption",
     security_posture: "Security Posture",
     dependency_health: "Dependency Health",
     readme_quality: "README Quality",
@@ -125,6 +158,7 @@ function formatFullResult(data) {
     skill_spec_compliance: "Spec Compliance",
     license_clarity: "License Clarity",
     tool_safety: "Tool Safety",
+    supply_chain_safety: "Supply Chain Safety",
   };
 
   for (const [key, val] of Object.entries(data.signals)) {
@@ -165,6 +199,11 @@ function formatFullResult(data) {
 
   if (data.disqualifiers?.length > 0) {
     lines.push("", `## ⚠️ Disqualifiers: ${data.disqualifiers.join(", ")}`);
+  }
+
+  // Recommendations
+  if (data.recommendations) {
+    lines.push(...formatRecommendations(data.recommendations));
   }
 
   lines.push("", `Scanned at: ${data.scannedAt}`);
@@ -239,7 +278,7 @@ function formatSafetyResult(data) {
 const server = new Server(
   {
     name: "mcpskills",
-    version: "1.0.0",
+    version: "2.0.0",
   },
   {
     capabilities: {
@@ -297,6 +336,55 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                 'Optional: filter by package name (e.g., "claude-power-user"). Omit to list all packages.',
             },
           },
+        },
+      },
+      {
+        name: "get_badge",
+        description:
+          "Get a trust badge URL for any GitHub repo. Returns a shields.io-style SVG badge showing the trust score and tier. Embed in READMEs to show verified trust status. Badge auto-updates hourly.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            repo: {
+              type: "string",
+              description: 'GitHub repo in "owner/repo" format',
+            },
+          },
+          required: ["repo"],
+        },
+      },
+      {
+        name: "watch_repo",
+        description:
+          "Start monitoring a repo for trust score changes. You'll be alerted when a repo's score changes significantly (±0.3 points or tier change). Free tier: up to 20 repos.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            repo: {
+              type: "string",
+              description: 'GitHub repo in "owner/repo" format',
+            },
+            email: {
+              type: "string",
+              description: "Email address for alerts",
+            },
+          },
+          required: ["repo", "email"],
+        },
+      },
+      {
+        name: "check_watched",
+        description:
+          "Re-scan all watched repos and check for score changes. Returns any repos whose trust score changed significantly since last check.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            email: {
+              type: "string",
+              description: "Email address used when watching repos",
+            },
+          },
+          required: ["email"],
         },
       },
     ],
@@ -391,6 +479,123 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
 
         lines.push("---", "All packages vetted by mcpskills.io");
+        return { content: [{ type: "text", text: lines.join("\n") }] };
+      }
+
+      case "get_badge": {
+        const repo = args.repo;
+        if (!repo || !repo.includes("/")) {
+          return {
+            content: [{ type: "text", text: 'Invalid repo format. Use "owner/repo".' }],
+            isError: true,
+          };
+        }
+
+        const badgeUrl = `https://mcpskills.io/.netlify/functions/badge?repo=${encodeURIComponent(repo)}`;
+        const reportUrl = `https://mcpskills.io/?repo=${encodeURIComponent(repo)}`;
+
+        const lines = [
+          `# Trust Badge for ${repo}`,
+          "",
+          "## Badge URL",
+          `\`${badgeUrl}\``,
+          "",
+          "## Embed in README.md",
+          "```markdown",
+          `[![MCP Skills Trust Score](${badgeUrl})](${reportUrl})`,
+          "```",
+          "",
+          "## Embed in HTML",
+          "```html",
+          `<a href="${reportUrl}"><img src="${badgeUrl}" alt="MCP Skills Trust Score" /></a>`,
+          "```",
+          "",
+          "The badge auto-updates hourly. It shows the current trust score, tier, and links to the full report.",
+          "",
+          "---",
+          "Verified by mcpskills.io",
+        ];
+
+        return { content: [{ type: "text", text: lines.join("\n") }] };
+      }
+
+      case "watch_repo": {
+        const repo = args.repo;
+        const email = args.email;
+        if (!repo || !repo.includes("/")) {
+          return {
+            content: [{ type: "text", text: 'Invalid repo format. Use "owner/repo".' }],
+            isError: true,
+          };
+        }
+        if (!email || !email.includes("@")) {
+          return {
+            content: [{ type: "text", text: "Invalid email address." }],
+            isError: true,
+          };
+        }
+
+        const res = await fetch(`${API_BASE}/monitor`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "watch", repo, email }),
+        });
+        const data = await res.json();
+
+        const lines = [
+          `# Watching ${repo}`,
+          "",
+          `**Current Score:** ${data.currentScore ?? "Scanning..."}`,
+          `**Current Tier:** ${data.currentTier ? formatTier(data.currentTier) : "Unknown"}`,
+          `**Total Watched:** ${data.totalWatched || 1}`,
+          "",
+          `You'll be notified at ${email} when this repo's trust score changes by ±0.3 points or its tier changes.`,
+          "",
+          "Use **check_watched** to manually re-scan all your watched repos.",
+        ];
+
+        return { content: [{ type: "text", text: lines.join("\n") }] };
+      }
+
+      case "check_watched": {
+        const email = args.email;
+        if (!email || !email.includes("@")) {
+          return {
+            content: [{ type: "text", text: "Invalid email address." }],
+            isError: true,
+          };
+        }
+
+        const res = await fetch(`${API_BASE}/monitor`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "check", email }),
+        });
+        const data = await res.json();
+
+        const lines = [
+          `# Monitoring Report`,
+          "",
+          `**Repos Checked:** ${data.checked || 0}`,
+          `**Changes Detected:** ${data.changes?.length || 0}`,
+          "",
+        ];
+
+        if (data.changes?.length > 0) {
+          lines.push("## Score Changes");
+          for (const c of data.changes) {
+            const arrow = c.delta > 0 ? "↑" : "↓";
+            const emoji = c.delta > 0 ? "📈" : "📉";
+            lines.push(`  ${emoji} **${c.repo}** ${c.oldScore} → ${c.newScore} (${arrow}${Math.abs(c.delta)})`);
+            if (c.tierChanged) {
+              lines.push(`     Tier: ${c.oldTier} → ${c.newTier}`);
+            }
+          }
+        } else {
+          lines.push("✅ All watched repos are stable. No significant changes.");
+        }
+
+        lines.push("", "---", "Powered by mcpskills.io");
         return { content: [{ type: "text", text: lines.join("\n") }] };
       }
 
