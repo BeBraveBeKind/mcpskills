@@ -8,6 +8,7 @@
     "build": "echo 'Static site — no build step'"
   },
   "dependencies": {
+    "@netlify/blobs": "^10.7.4",
     "@resvg/resvg-js": "^2.6.2",
     "satori": "^0.25.0"
   },

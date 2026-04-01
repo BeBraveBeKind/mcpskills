@@ -109,8 +109,13 @@
         { "owner": "colinhacks", "repo": "zod", "label": "TypeScript-first schema validation" },
         { "owner": "ajv-validator", "repo": "ajv", "label": "JSON Schema validator" }
       ]
+    },
+    "openclaw-skill": {
+      "name": "OpenClaw Skills",
+      "keywords": ["openclaw", "clawhub", "claw", "agent-skill", "skill.md", "claw-skill"],
+      "repos": []
     }
   },
-  "version": "1.0.0",
-  "lastUpdated": "2026-03-09"
+  "version": "1.1.0",
+  "lastUpdated": "2026-03-31"
 }

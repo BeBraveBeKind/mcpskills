@@ -2,25 +2,24 @@
  * GET /.netlify/functions/badge?repo=owner/repo
  * Returns an SVG trust badge for embedding in READMEs.
  *
- * Usage in markdown:
- *   ![Trust Score](https://mcpskills.io/.netlify/functions/badge?repo=owner/repo)
- *
- * Badge shows: score, tier icon, and "Verified by MCP Skills" text.
- * Links to full report at mcpskills.io.
+ * Rate limited: 100 requests/hour per IP.
  */
 
+const { connectLambda, getStore } = require('@netlify/blobs');
 const { scoreRepo } = require('../../lib/scorer');
 const { cacheScore, loadScoreCache } = require('../../lib/recommender');
+const { hashIP, checkRateLimit } = require('../../lib/auth');
 
 const TIER_COLORS = {
   verified: { bg: '#16a34a', label: 'Verified' },
   established: { bg: '#ca8a04', label: 'Established' },
   new: { bg: '#3b82f6', label: 'New' },
   blocked: { bg: '#dc2626', label: 'Blocked' },
+  certified: { bg: '#B8860B', label: 'Certified Safe' },
 };
 
-function generateBadgeSVG(repo, score, tier) {
-  const tierInfo = TIER_COLORS[tier] || TIER_COLORS.new;
+function generateBadgeSVG(repo, score, tier, certified) {
+  const tierInfo = certified ? TIER_COLORS.certified : (TIER_COLORS[tier] || TIER_COLORS.new);
   const scoreText = score != null ? `${score}/10` : '?';
   const labelWidth = 100;
   const scoreWidth = 70;
@@ -56,16 +55,31 @@ function generateBadgeSVG(repo, score, tier) {
 exports.handler = async (event) => {
   const headers = {
     'Content-Type': 'image/svg+xml',
-    'Cache-Control': 'public, max-age=3600, s-maxage=3600', // Cache 1 hour
+    'Cache-Control': 'public, max-age=3600, s-maxage=3600',
     'Access-Control-Allow-Origin': '*',
   };
+
+  // Initialize Blobs for rate limiting
+  connectLambda(event);
 
   if (event.httpMethod !== 'GET') {
     return { statusCode: 405, headers: { 'Content-Type': 'text/plain' }, body: 'GET only' };
   }
 
+  // Rate limit: 100/hour per IP
+  const ipHash = hashIP(event);
+  const rateCheck = await checkRateLimit(ipHash, 'badge');
+  if (!rateCheck.allowed) {
+    return {
+      statusCode: 429,
+      headers: { 'Content-Type': 'text/plain' },
+      body: 'Rate limit exceeded. Try again later.',
+    };
+  }
+
   const repo = event.queryStringParameters?.repo;
-  if (!repo || !repo.includes('/')) {
+  const REPO_RE = /^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/;
+  if (!repo || !REPO_RE.test(repo)) {
     return {
       statusCode: 400,
       headers: { 'Content-Type': 'text/plain' },
@@ -75,7 +89,7 @@ exports.handler = async (event) => {
 
   const [owner, repoName] = repo.split('/');
 
-  // Check cache first — avoid re-scanning for every badge request
+  // Check cache first
   const cache = loadScoreCache();
   let score = null;
   let tier = 'new';
@@ -84,7 +98,6 @@ exports.handler = async (event) => {
     score = cache[repo].composite;
     tier = cache[repo].tier;
   } else {
-    // Score it live and cache
     const token = process.env.GITHUB_TOKEN || null;
     try {
       const result = await scoreRepo(owner, repoName, token);
@@ -98,6 +111,17 @@ exports.handler = async (event) => {
     }
   }
 
-  const svg = generateBadgeSVG(repo, score, tier);
+  // Check certification status
+  let certified = false;
+  try {
+    const certStore = getStore('certifications');
+    const raw = await certStore.get(`cert:${repo}`);
+    if (raw) {
+      const record = JSON.parse(raw);
+      certified = record.status === 'certified';
+    }
+  } catch {}
+
+  const svg = generateBadgeSVG(repo, score, tier, certified);
   return { statusCode: 200, headers, body: svg };
 };

@@ -10,10 +10,15 @@
  *   - check_trust_score: Score any GitHub repo
  *   - scan_safety: Run safety-only scan for AI skills
  *   - list_packages: Browse curated safe skill packages
+ *   - get_badge: Get trust badge URL for READMEs
+ *   - watch_repo: Monitor a repo for score changes
+ *   - check_watched: Re-scan all watched repos
+ *   - batch_check: Check up to 5 repos in one call (Pro)
+ *   - auto_gate: "Should I install this?" → boolean + reason
  *
- * Free tier returns tier + dimension scores.
- * Full reports (all 12 signals + safety findings) require an API key.
- * Get your key at https://mcpskills.io/api
+ * Free tier returns compact agent response.
+ * Full reports require MCPSKILLS_API_KEY env var.
+ * Get your key at https://mcpskills.io
  */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -29,7 +34,10 @@ const PACKAGES_URL = "https://mcpskills.io/.netlify/functions/packages";
 // --- API Client ---
 
 async function fetchScore(repo, apiKey) {
-  const headers = { "Content-Type": "application/json" };
+  const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+  };
   if (apiKey) headers["X-API-Key"] = apiKey;
 
   const res = await fetch(`${API_BASE}/score`, {
@@ -37,6 +45,16 @@ async function fetchScore(repo, apiKey) {
     headers,
     body: JSON.stringify({ repo }),
   });
+
+  if (res.status === 429) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`Rate limit exceeded. ${err.upgrade || 'Set MCPSKILLS_API_KEY for more scans.'}`);
+  }
+
+  if (res.status === 401 || res.status === 403) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `Auth error: ${res.status}`);
+  }
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }));
@@ -94,39 +112,33 @@ function formatRecommendations(recs) {
   return lines;
 }
 
-function formatFreeResult(data) {
+// --- Agent Response Formatting ---
+
+function formatAgentResponse(data) {
+  // Compact agent response (from free tier API)
+  const rec = data.recommendation || (data.safe ? 'install' : 'caution');
+  const icon = data.safe ? '✅' : data.recommendation === 'blocked' ? '🚫' : '⚠️';
+
   const lines = [
-    `# Trust Score: ${data.repo}`,
-    "",
-    `**Score:** ${data.composite}/10`,
-    `**Tier:** ${formatTier(data.tier)}`,
-    `**Mode:** ${data.mode === "skills" ? "Skills Mode (AI skill detected)" : "Standard Mode"}`,
-    "",
-    `## Dimensions`,
-    formatDimensions(data.dimensions),
-    "",
-    `⭐ ${data.meta.stars.toLocaleString()} stars | 🍴 ${data.meta.forks.toLocaleString()} forks | 📄 ${data.meta.license}`,
+    `${icon} ${data.safe ? 'SAFE to install' : 'CAUTION'} — ${formatTier(data.tier)} (${data.score}/10)`,
+    `Recommendation: ${rec}`,
   ];
 
-  if (data.mode === "skills" && data.skill) {
-    lines.push("", `## Skill Info`);
-    lines.push(`  Type: ${data.skill.type}`);
-    lines.push(`  Safety: ${data.skill.safety?.summary || "Not scanned"}`);
+  if (data.flags?.length > 0) {
+    lines.push(`Flags: ${data.flags.join(', ')}`);
   }
 
-  // Recommendations
-  if (data.recommendations) {
-    lines.push(...formatRecommendations(data.recommendations));
+  if (data.reasoning) {
+    lines.push(`Analysis: ${data.reasoning}`);
   }
 
-  lines.push(
-    "",
-    "---",
-    "🔒 Full report (all signals + safety findings) → https://mcpskills.io",
-    "Set MCPSKILLS_API_KEY for full reports in-context."
-  );
+  if (data.certified) {
+    lines.push('🏅 Certified Safe by MCP Skills');
+  }
 
-  return lines.join("\n");
+  lines.push('', 'Set MCPSKILLS_API_KEY for full 14-signal breakdown.');
+
+  return lines.join('\n');
 }
 
 function formatFullResult(data) {
@@ -161,7 +173,7 @@ function formatFullResult(data) {
     supply_chain_safety: "Supply Chain Safety",
   };
 
-  for (const [key, val] of Object.entries(data.signals)) {
+  for (const [key, val] of Object.entries(data.signals || {})) {
     const label = signalLabels[key] || key;
     const bar = "█".repeat(Math.round(val)) + "░".repeat(10 - Math.round(val));
     lines.push(`  ${bar} ${val}/10  ${label}`);
@@ -169,13 +181,29 @@ function formatFullResult(data) {
 
   lines.push(
     "",
-    `⭐ ${data.meta.stars.toLocaleString()} stars | 🍴 ${data.meta.forks.toLocaleString()} forks | 📄 ${data.meta.license}`
+    `⭐ ${(data.meta?.stars || 0).toLocaleString()} stars | 🍴 ${(data.meta?.forks || 0).toLocaleString()} forks | 📄 ${data.meta?.license || 'Unknown'}`
   );
 
   if (data.mode === "skills" && data.skill) {
     lines.push("", `## Skill Details`);
     lines.push(`  Type: ${data.skill.type}`);
-    lines.push(`  Indicators: ${data.skill.indicators.join(", ")}`);
+    if (data.skill.indicators) lines.push(`  Indicators: ${data.skill.indicators.join(", ")}`);
+
+    // OpenClaw frontmatter
+    if (data.skill.frontmatter) {
+      lines.push("", `  ### SKILL.md Frontmatter`);
+      const fm = data.skill.frontmatter;
+      if (fm.name) lines.push(`    Name: ${fm.name}`);
+      if (fm.version) lines.push(`    Version: ${fm.version}`);
+      if (fm.description) lines.push(`    Description: ${fm.description}`);
+      if (data.skill.transparency?.bonus > 0) {
+        lines.push(`    🛡️ Transparency bonus: +${data.skill.transparency.bonus} to tool_safety`);
+        const d = data.skill.transparency.details;
+        if (d.hasSecuritySection) lines.push(`      ✓ Declares security posture`);
+        if (d.hasAllowedTools) lines.push(`      ✓ Lists allowed tools (${d.allowedToolsCount})`);
+        if (d.hasRequires) lines.push(`      ✓ Declares requirements`);
+      }
+    }
 
     if (data.skill.specChecks) {
       lines.push("", `  ### Spec Compliance`);
@@ -201,7 +229,6 @@ function formatFullResult(data) {
     lines.push("", `## ⚠️ Disqualifiers: ${data.disqualifiers.join(", ")}`);
   }
 
-  // Recommendations
   if (data.recommendations) {
     lines.push(...formatRecommendations(data.recommendations));
   }
@@ -229,7 +256,7 @@ function formatSafetyResult(data) {
     `# Safety Scan: ${data.repo}`,
     "",
     `**Skill Type:** ${data.skill.type}`,
-    `**Safety Score:** ${data.signals.tool_safety}/10`,
+    `**Safety Score:** ${data.signals?.tool_safety ?? '?'}/10`,
     `**Status:** ${data.skill.safety?.summary || "Unknown"}`,
     "",
   ];
@@ -278,7 +305,7 @@ function formatSafetyResult(data) {
 const server = new Server(
   {
     name: "mcpskills",
-    version: "2.0.0",
+    version: "2.1.0",
   },
   {
     capabilities: {
@@ -294,7 +321,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "check_trust_score",
         description:
-          "Score any GitHub repo for trustworthiness. Returns a trust score (0-10) across 4 dimensions: Alive (maintained?), Legit (credible author?), Solid (secure?), Usable (good docs?). AI skills and MCP servers get enhanced scanning with 5 safety checks. Set MCPSKILLS_API_KEY env var for full 12-signal reports.",
+          "Score any GitHub repo for trustworthiness. Returns a trust score (0-10) across 4 dimensions: Alive (maintained?), Legit (credible author?), Solid (secure?), Usable (good docs?). AI skills and MCP servers get enhanced scanning with 5 safety checks. Set MCPSKILLS_API_KEY env var for full 14-signal reports.",
         inputSchema: {
           type: "object",
           properties: {
@@ -356,7 +383,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "watch_repo",
         description:
-          "Start monitoring a repo for trust score changes. You'll be alerted when a repo's score changes significantly (±0.3 points or tier change). Free tier: up to 20 repos.",
+          "Start monitoring a repo for trust score changes. You'll be alerted when a repo's score changes significantly (±0.3 points or tier change). Requires a paid API key.",
         inputSchema: {
           type: "object",
           properties: {
@@ -387,6 +414,37 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           required: ["email"],
         },
       },
+      {
+        name: "batch_check",
+        description:
+          "Check up to 5 repos in one call. Returns a trust assessment for each repo. Requires a Pro API key (MCPSKILLS_API_KEY). Great for bulk-vetting dependencies.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            repos: {
+              type: "array",
+              items: { type: "string" },
+              description: 'Array of GitHub repos in "owner/repo" format (max 5)',
+            },
+          },
+          required: ["repos"],
+        },
+      },
+      {
+        name: "auto_gate",
+        description:
+          'Should I install this? Returns a simple go/no-go decision with reasoning. The fastest way to check if a repo is safe to use. Returns { proceed: true/false, reason: "..." }.',
+        inputSchema: {
+          type: "object",
+          properties: {
+            repo: {
+              type: "string",
+              description: 'GitHub repo in "owner/repo" format',
+            },
+          },
+          required: ["repo"],
+        },
+      },
     ],
   };
 });
@@ -413,9 +471,19 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
 
         const data = await fetchScore(repo, apiKey);
-        const formatted = apiKey
-          ? formatFullResult(data)
-          : formatFreeResult(data);
+
+        // Determine if we got a full response or agent compact response
+        let formatted;
+        if (data.signals && data.dimensions) {
+          // Full paid response
+          formatted = formatFullResult(data);
+        } else if (data.safe !== undefined) {
+          // Agent compact response
+          formatted = formatAgentResponse(data);
+        } else {
+          // Human free response — format it for the agent
+          formatted = `${formatTier(data.tier)} ${data.repo} — ${data.composite}/10\n\nSet MCPSKILLS_API_KEY for full signal breakdown.`;
+        }
 
         return { content: [{ type: "text", text: formatted }] };
       }
@@ -471,9 +539,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           lines.push("");
           const items = pkg.skills || pkg.repos || [];
           for (const item of items) {
-            const name = item.name || `${item.owner}/${item.repo}`;
+            const itemName = item.name || `${item.owner}/${item.repo}`;
             const desc = item.description || item.role || "";
-            lines.push(`  - **${name}** — ${desc}`);
+            lines.push(`  - **${itemName}** — ${desc}`);
           }
           lines.push("");
         }
@@ -535,12 +603,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           };
         }
 
+        const headers = { "Content-Type": "application/json" };
+        if (apiKey) headers["X-API-Key"] = apiKey;
+
         const res = await fetch(`${API_BASE}/monitor`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers,
           body: JSON.stringify({ action: "watch", repo, email }),
         });
         const data = await res.json();
+
+        if (res.status === 403) {
+          return {
+            content: [{ type: "text", text: data.error || "Monitoring requires a paid plan. Get one at https://mcpskills.io" }],
+            isError: true,
+          };
+        }
 
         const lines = [
           `# Watching ${repo}`,
@@ -566,9 +644,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           };
         }
 
+        const headers = { "Content-Type": "application/json" };
+        if (apiKey) headers["X-API-Key"] = apiKey;
+
         const res = await fetch(`${API_BASE}/monitor`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers,
           body: JSON.stringify({ action: "check", email }),
         });
         const data = await res.json();
@@ -597,6 +678,105 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
         lines.push("", "---", "Powered by mcpskills.io");
         return { content: [{ type: "text", text: lines.join("\n") }] };
+      }
+
+      case "batch_check": {
+        const repos = args.repos;
+        if (!Array.isArray(repos) || repos.length === 0) {
+          return {
+            content: [{ type: "text", text: "Provide an array of repos to check." }],
+            isError: true,
+          };
+        }
+
+        if (!apiKey) {
+          return {
+            content: [{ type: "text", text: "batch_check requires a Pro API key. Set MCPSKILLS_API_KEY env var.\nGet one at https://mcpskills.io" }],
+            isError: true,
+          };
+        }
+
+        const batch = repos.slice(0, 5);
+        const results = [];
+
+        for (const repo of batch) {
+          if (!repo.includes("/")) {
+            results.push(`❌ ${repo} — invalid format`);
+            continue;
+          }
+          try {
+            const data = await fetchScore(repo, apiKey);
+            if (data.safe !== undefined) {
+              const icon = data.safe ? '✅' : data.recommendation === 'blocked' ? '🚫' : '⚠️';
+              results.push(`${icon} ${repo} — ${data.tier} (${data.score}/10) → ${data.recommendation}`);
+            } else if (data.signals) {
+              results.push(`${formatTier(data.tier)} ${repo} — ${data.composite}/10`);
+            } else {
+              results.push(`${formatTier(data.tier)} ${repo} — ${data.composite}/10`);
+            }
+          } catch (err) {
+            results.push(`❌ ${repo} — ${err.message}`);
+          }
+        }
+
+        const lines = [
+          `# Batch Trust Check (${batch.length} repos)`,
+          "",
+          ...results,
+          "",
+          `Checked ${batch.length} of ${repos.length} repos.`,
+        ];
+
+        if (repos.length > 5) {
+          lines.push(`⚠️ Max 5 per batch. ${repos.length - 5} skipped.`);
+        }
+
+        lines.push("", "---", "Powered by mcpskills.io");
+        return { content: [{ type: "text", text: lines.join("\n") }] };
+      }
+
+      case "auto_gate": {
+        const repo = args.repo;
+        if (!repo || !repo.includes("/")) {
+          return {
+            content: [{ type: "text", text: 'Invalid repo format. Use "owner/repo".' }],
+            isError: true,
+          };
+        }
+
+        const data = await fetchScore(repo, apiKey);
+
+        let proceed, reason;
+
+        if (data.safe !== undefined) {
+          // Agent compact response
+          proceed = data.safe || data.certified;
+          if (data.certified) {
+            reason = `Certified Safe — verified by MCP Skills (${data.score}/10)`;
+          } else if (data.safe) {
+            reason = `${data.tier} (${data.score}/10). ${data.reasoning || 'No disqualifiers.'}`;
+          } else {
+            reason = `${data.recommendation}: ${data.flags?.join(', ') || data.reasoning || 'Review needed.'}`;
+          }
+        } else {
+          // Full or human response — derive go/no-go
+          const tier = data.tier;
+          const disqualifiers = data.disqualifiers || [];
+          proceed = (tier === 'verified' || tier === 'established') && disqualifiers.length === 0;
+          const score = data.composite ?? data.score;
+          reason = proceed
+            ? `${tier} (${score}/10). Safe to install.`
+            : `${tier} (${score}/10). ${disqualifiers.length ? 'Disqualifiers: ' + disqualifiers.join(', ') : 'Review recommended.'}`;
+        }
+
+        const icon = proceed ? '✅' : '🚫';
+        const text = [
+          `${icon} ${proceed ? 'PROCEED' : 'DO NOT INSTALL'} — ${repo}`,
+          '',
+          reason,
+        ].join('\n');
+
+        return { content: [{ type: "text", text }] };
       }
 
       default:

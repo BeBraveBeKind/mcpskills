@@ -75,7 +75,8 @@ exports.handler = async (event) => {
   }
 
   const repoPath = body.repo;
-  if (!repoPath || !repoPath.includes('/')) {
+  const REPO_RE = /^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/;
+  if (!repoPath || !REPO_RE.test(repoPath)) {
     return {
       statusCode: 400,
       headers,
@@ -186,7 +187,7 @@ exports.handler = async (event) => {
       const ip = (event.headers['x-forwarded-for'] || event.headers['client-ip'] || 'unknown').split(',')[0].trim();
       // Hash IP for privacy — just first 8 chars of a simple hash
       const ipHash = Array.from(ip).reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0).toString(16).slice(-8);
-      const keyPrefix = auth.key ? auth.key.slice(0, 8) : null;
+      const keyPrefix = auth.key ? auth.key.slice(0, 12) + '...' : null;
 
       const entry = {
         ts: now.toISOString(),
@@ -222,7 +223,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Internal scoring error', details: err.message }),
+      body: JSON.stringify({ error: 'Internal scoring error' }),
     };
   }
 };

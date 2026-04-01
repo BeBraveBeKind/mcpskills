@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCPSkills — Card Mockups</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0D1117;
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: #E6EDF3;
+    padding: 3rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4rem;
+  }
+
+  .mockup-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #3FB950;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  .mockup-sublabel {
+    font-size: 0.75rem;
+    color: #484F58;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    max-width: 500px;
+  }
+
+  /* ─────────────────────────────────────
+     1. OG / LINKEDIN SHARE CARD (1200x630)
+     Scaled to 600x315 for display
+     ───────────────────────────────────── */
+  .og-card {
+    width: 600px;
+    height: 315px;
+    background: #0D1117;
+    border-radius: 12px;
+    border: 1px solid #30363D;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 32px;
+    position: relative;
+  }
+  .og-card .og-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .og-card .og-brand {
+    font-size: 0.65rem;
+    color: #8B949E;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+  }
+  .og-card .og-url {
+    font-size: 0.6rem;
+    color: #484F58;
+  }
+  .og-card .og-repo {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .og-card .og-desc {
+    font-size: 0.72rem;
+    color: #8B949E;
+    margin-bottom: 14px;
+  }
+  .og-card .og-sep {
+    width: 100%;
+    height: 1px;
+    background: #30363D;
+    margin-bottom: 14px;
+  }
+
+  /* Score hero area */
+  .og-score-area {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 16px;
+  }
+  .og-score-circle {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .og-score-circle.verified { background: rgba(63,185,80,0.12); border: 2px solid #3FB950; }
+  .og-score-circle.established { background: rgba(210,153,34,0.12); border: 2px solid #D29922; }
+  .og-score-circle .score-num {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .og-score-circle.verified .score-num { color: #3FB950; }
+  .og-score-circle.established .score-num { color: #D29922; }
+  .og-score-circle .score-label {
+    font-size: 0.5rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .og-score-circle.verified .score-label { color: #3FB950; }
+
+  .og-score-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .og-tier-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 10px;
+    display: inline-block;
+    width: fit-content;
+  }
+  .og-tier-label.verified { background: rgba(63,185,80,0.15); color: #3FB950; }
+  .og-agent-line {
+    font-size: 0.65rem;
+    color: #8B949E;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .og-agent-line .safe-badge {
+    color: #3FB950;
+    font-weight: 700;
+  }
+
+  /* Dimension mini-bars */
+  .og-dims {
+    display: flex;
+    gap: 16px;
+    flex: 1;
+  }
+  .og-dim {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+  }
+  .og-dim-label {
+    font-size: 0.55rem;
+    font-weight: 600;
+    color: #484F58;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .og-dim-bar-wrap {
+    height: 4px;
+    background: #161B22;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .og-dim-bar {
+    height: 100%;
+    border-radius: 2px;
+  }
+  .og-dim-bar.green { background: #3FB950; }
+  .og-dim-bar.amber { background: #D29922; }
+
+  .og-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid #21262D;
+  }
+  .og-footer .stars {
+    font-size: 0.6rem;
+    color: #8B949E;
+  }
+  .og-footer .cta {
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: #3FB950;
+    letter-spacing: 0.5px;
+  }
+
+  /* ─────────────────────────────────────
+     2. TRUST SCORE RESULT CARD (Web UI)
+     ───────────────────────────────────── */
+  .result-section {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+  }
+
+  .result-card {
+    width: 420px;
+    background: #161B22;
+    border: 1px solid #30363D;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .result-card .rc-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #30363D;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .rc-tier-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+  .rc-tier-badge.verified { background: rgba(63,185,80,0.12); }
+  .rc-title { font-size: 1rem; font-weight: 600; }
+  .rc-subtitle { font-size: 0.78rem; color: #8B949E; margin-top: 1px; }
+  .rc-tier-tag {
+    margin-left: auto;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 10px;
+  }
+  .rc-tier-tag.verified { background: rgba(63,185,80,0.12); color: #3FB950; }
+
+  /* FREE tier — minimal */
+  .rc-free {
+    padding: 24px;
+    text-align: center;
+  }
+  .rc-free .big-score {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #3FB950;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .rc-free .big-score-label {
+    font-size: 0.7rem;
+    color: #484F58;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .rc-free .agent-rec {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #3FB950;
+    background: rgba(63,185,80,0.08);
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .rc-free .unlock-cta {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: #3FB950;
+    color: #0D1117;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    margin-top: 16px;
+  }
+  .rc-free .unlock-cta:hover { background: #2ea043; }
+  .rc-free .scans-left {
+    font-size: 0.65rem;
+    color: #484F58;
+    margin-top: 8px;
+  }
+
+  /* PAID tier — full detail */
+  .rc-paid {
+    padding: 20px 24px;
+  }
+  .rc-paid .dims {
+    margin-bottom: 20px;
+  }
+  .dim-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .dim-label {
+    width: 60px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #8B949E;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .dim-bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: #0D1117;
+    border-radius: 3px;
+    margin: 0 10px;
+    overflow: hidden;
+  }
+  .dim-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.8s ease;
+  }
+  .dim-bar.green { background: #3FB950; }
+  .dim-bar.amber { background: #D29922; }
+  .dim-score {
+    width: 32px;
+    text-align: right;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  /* Signals grid */
+  .signals-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .signal-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    background: #0D1117;
+    border-radius: 6px;
+    font-size: 0.7rem;
+  }
+  .signal-name { color: #8B949E; }
+  .signal-score { font-weight: 600; }
+  .signal-score.good { color: #3FB950; }
+  .signal-score.mid { color: #D29922; }
+
+  /* Safety section */
+  .safety-section {
+    background: rgba(63,185,80,0.06);
+    border: 1px solid rgba(63,185,80,0.15);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .safety-header {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #3FB950;
+    margin-bottom: 4px;
+  }
+  .safety-text {
+    font-size: 0.68rem;
+    color: #8B949E;
+  }
+
+  /* ─────────────────────────────────────
+     3. README BADGES
+     ───────────────────────────────────── */
+  .badge-row {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .badge-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .badge-item .badge-type {
+    font-size: 0.6rem;
+    color: #484F58;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Standard badge SVG inline mockup */
+  .badge-svg {
+    height: 22px;
+    border-radius: 3px;
+    overflow: hidden;
+    display: flex;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 22px;
+  }
+  .badge-svg .b-label {
+    background: #555;
+    color: #fff;
+    padding: 0 8px;
+    white-space: nowrap;
+  }
+  .badge-svg .b-score {
+    background: #333;
+    color: #fff;
+    padding: 0 8px;
+  }
+  .badge-svg .b-tier {
+    padding: 0 8px;
+    color: #fff;
+  }
+  .badge-svg .b-tier.verified { background: #16a34a; }
+  .badge-svg .b-tier.established { background: #ca8a04; }
+  .badge-svg .b-tier.new { background: #3b82f6; }
+  .badge-svg .b-tier.blocked { background: #dc2626; }
+  .badge-svg .b-tier.certified { background: #B8860B; }
+
+  /* ─────────────────────────────────────
+     LAYOUT HELPERS
+     ───────────────────────────────────── */
+  .mockup-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 900px;
+    width: 100%;
+  }
+  .side-by-side {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .card-label {
+    font-size: 0.6rem;
+    color: #3FB950;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     1. OG / LINKEDIN SHARE CARD
+     ═══════════════════════════════════════ -->
+<div class="mockup-group">
+  <p class="mockup-label">1. OG / LinkedIn Share Card</p>
+  <p class="mockup-sublabel">Shows when someone pastes a MCPSkills link on LinkedIn, Twitter, Slack, etc. 1200x630 rendered as PNG via Satori.</p>
+
+  <div class="og-card">
+    <div class="og-header">
+      <span class="og-brand">🔍 MCP SKILLS</span>
+      <span class="og-url">mcpskills.io</span>
+    </div>
+    <div class="og-repo">anthropics/anthropic-sdk-typescript</div>
+    <div class="og-desc">The official TypeScript library for the Anthropic API</div>
+    <div class="og-sep"></div>
+
+    <div class="og-score-area">
+      <div class="og-score-circle verified">
+        <span class="score-num">8.5</span>
+        <span class="score-label">/ 10</span>
+      </div>
+      <div class="og-score-meta">
+        <span class="og-tier-label verified">✅ Verified</span>
+        <span class="og-agent-line"><span class="safe-badge">SAFE</span> Recommendation: install</span>
+        <span class="og-agent-line">14 signals · Skills Mode · No flags</span>
+      </div>
+    </div>
+
+    <div class="og-dims">
+      <div class="og-dim">
+        <span class="og-dim-label">Alive</span>
+        <div class="og-dim-bar-wrap"><div class="og-dim-bar green" style="width:90%"></div></div>
+      </div>
+      <div class="og-dim">
+        <span class="og-dim-label">Legit</span>
+        <div class="og-dim-bar-wrap"><div class="og-dim-bar green" style="width:95%"></div></div>
+      </div>
+      <div class="og-dim">
+        <span class="og-dim-label">Solid</span>
+        <div class="og-dim-bar-wrap"><div class="og-dim-bar green" style="width:78%"></div></div>
+      </div>
+      <div class="og-dim">
+        <span class="og-dim-label">Usable</span>
+        <div class="og-dim-bar-wrap"><div class="og-dim-bar green" style="width:82%"></div></div>
+      </div>
+    </div>
+
+    <div class="og-footer">
+      <span class="stars">⭐ 1,247 · MIT License</span>
+      <span class="cta">Scan any repo → mcpskills.io</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     2. TRUST SCORE RESULT CARD (Free vs Paid)
+     ═══════════════════════════════════════ -->
+<div class="mockup-group">
+  <p class="mockup-label">2. Trust Score Result Card</p>
+  <p class="mockup-sublabel">What users see after scanning a repo. Free tier (left) shows minimal data with upsell. Paid tier (right) shows everything.</p>
+
+  <div class="side-by-side">
+
+    <!-- FREE TIER -->
+    <div>
+      <p class="card-label">Free Tier (3/day)</p>
+      <div class="result-card">
+        <div class="rc-header">
+          <div class="rc-tier-badge verified">✅</div>
+          <div>
+            <div class="rc-title">anthropic-sdk-typescript</div>
+            <div class="rc-subtitle">anthropics · Skills Mode</div>
+          </div>
+          <span class="rc-tier-tag verified">Verified</span>
+        </div>
+        <div class="rc-free">
+          <div class="big-score">8.5</div>
+          <div class="big-score-label">Trust Score</div>
+          <div class="agent-rec">✓ Safe to install</div>
+          <p style="font-size:0.78rem; color:#8B949E; margin: 12px 0 0;">14 signals analyzed across 4 dimensions.<br>Unlock the full report to see what's inside.</p>
+          <button class="unlock-cta">Get Full Report — $9</button>
+          <div class="scans-left">2 free scans remaining today</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAID TIER -->
+    <div>
+      <p class="card-label">Paid / API Key</p>
+      <div class="result-card">
+        <div class="rc-header">
+          <div class="rc-tier-badge verified">✅</div>
+          <div>
+            <div class="rc-title">anthropic-sdk-typescript</div>
+            <div class="rc-subtitle">anthropics · Skills Mode · 14 signals</div>
+          </div>
+          <span class="rc-tier-tag verified">Verified</span>
+        </div>
+        <div class="rc-paid">
+          <div class="dims">
+            <div class="dim-row">
+              <span class="dim-label">Alive</span>
+              <div class="dim-bar-wrap"><div class="dim-bar green" style="width:90%"></div></div>
+              <span class="dim-score">9.0</span>
+            </div>
+            <div class="dim-row">
+              <span class="dim-label">Legit</span>
+              <div class="dim-bar-wrap"><div class="dim-bar green" style="width:95%"></div></div>
+              <span class="dim-score">9.5</span>
+            </div>
+            <div class="dim-row">
+              <span class="dim-label">Solid</span>
+              <div class="dim-bar-wrap"><div class="dim-bar green" style="width:78%"></div></div>
+              <span class="dim-score">7.8</span>
+            </div>
+            <div class="dim-row">
+              <span class="dim-label">Usable</span>
+              <div class="dim-bar-wrap"><div class="dim-bar green" style="width:82%"></div></div>
+              <span class="dim-score">8.2</span>
+            </div>
+          </div>
+
+          <div class="signals-grid">
+            <div class="signal-item"><span class="signal-name">Commit Recency</span><span class="signal-score good">9.2</span></div>
+            <div class="signal-item"><span class="signal-name">Release Cadence</span><span class="signal-score good">7.5</span></div>
+            <div class="signal-item"><span class="signal-name">Issue Response</span><span class="signal-score good">8.8</span></div>
+            <div class="signal-item"><span class="signal-name">Author Credibility</span><span class="signal-score good">9.5</span></div>
+            <div class="signal-item"><span class="signal-name">Community</span><span class="signal-score good">9.8</span></div>
+            <div class="signal-item"><span class="signal-name">Contributors</span><span class="signal-score good">8.2</span></div>
+            <div class="signal-item"><span class="signal-name">Downloads</span><span class="signal-score good">7.1</span></div>
+            <div class="signal-item"><span class="signal-name">Security</span><span class="signal-score good">7.0</span></div>
+            <div class="signal-item"><span class="signal-name">Dependencies</span><span class="signal-score good">7.5</span></div>
+            <div class="signal-item"><span class="signal-name">Tool Safety</span><span class="signal-score good">8.0</span></div>
+            <div class="signal-item"><span class="signal-name">Supply Chain</span><span class="signal-score mid">6.5</span></div>
+            <div class="signal-item"><span class="signal-name">README</span><span class="signal-score good">8.2</span></div>
+            <div class="signal-item"><span class="signal-name">Spec Compliance</span><span class="signal-score good">7.8</span></div>
+            <div class="signal-item"><span class="signal-name">License</span><span class="signal-score good">9.0</span></div>
+          </div>
+
+          <div class="safety-section">
+            <div class="safety-header">✓ Safety Scan — No Issues Found</div>
+            <div class="safety-text">Scanned 20 source files for prompt injection, shell execution, credential theft, network exfiltration, and obfuscated payloads. All clear.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     3. README BADGES
+     ═══════════════════════════════════════ -->
+<div class="mockup-group">
+  <p class="mockup-label">3. README Badges</p>
+  <p class="mockup-sublabel">SVG badges maintainers embed in their READMEs. Auto-updates hourly. Gold "Certified Safe" badge for approved repos.</p>
+
+  <div class="badge-row">
+    <div class="badge-item">
+      <span class="badge-type">Verified</span>
+      <div class="badge-svg">
+        <span class="b-label">MCP Skills</span>
+        <span class="b-score">8.5/10</span>
+        <span class="b-tier verified">Verified</span>
+      </div>
+    </div>
+
+    <div class="badge-item">
+      <span class="badge-type">Certified Safe ★</span>
+      <div class="badge-svg">
+        <span class="b-label">MCP Skills</span>
+        <span class="b-score">8.5/10</span>
+        <span class="b-tier certified">Certified Safe ✓</span>
+      </div>
+    </div>
+
+    <div class="badge-item">
+      <span class="badge-type">Established</span>
+      <div class="badge-svg">
+        <span class="b-label">MCP Skills</span>
+        <span class="b-score">6.2/10</span>
+        <span class="b-tier established">Established</span>
+      </div>
+    </div>
+
+    <div class="badge-item">
+      <span class="badge-type">New</span>
+      <div class="badge-svg">
+        <span class="b-label">MCP Skills</span>
+        <span class="b-score">3.8/10</span>
+        <span class="b-tier new">New</span>
+      </div>
+    </div>
+
+    <div class="badge-item">
+      <span class="badge-type">Blocked</span>
+      <div class="badge-svg">
+        <span class="b-label">MCP Skills</span>
+        <span class="b-score">—</span>
+        <span class="b-tier blocked">Blocked</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:2rem; text-align:center;">
+    <p style="font-size:0.75rem; color:#484F58; margin-bottom:8px;">Markdown embed:</p>
+    <code style="font-size:0.7rem; color:#8B949E; background:#161B22; padding:8px 16px; border-radius:6px; border:1px solid #30363D; display:inline-block;">
+      [![Trust Score](https://mcpskills.io/badge/anthropics/anthropic-sdk-typescript)](https://mcpskills.io)
+    </code>
+  </div>
+</div>
+
+</body>
+</html>

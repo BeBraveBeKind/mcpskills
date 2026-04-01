@@ -2,3 +2,18 @@
 .netlify
 node_modules
 .DS_Store
+
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+*.p12
+credentials.json
+service-account.json
+
+# Large binaries
+*.mp4
+*.mov
+*.avi
+video/
