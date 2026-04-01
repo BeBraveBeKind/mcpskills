@@ -106,6 +106,39 @@ exports.handler = async (event) => {
       result.recommendations = null;
     }
 
+    // --- Persist to Blob stores ---
+    try {
+      const cacheStore = getStore('score-cache');
+      const cacheRecord = {
+        composite: result.composite,
+        tier: result.tier,
+        mode: result.mode,
+        meta: {
+          description: result.meta?.description || '',
+          stars: result.meta?.stars || 0,
+          forks: result.meta?.forks || 0,
+          license: result.meta?.license || 'Unknown',
+        },
+        scannedAt: result.scannedAt,
+      };
+      await cacheStore.set(repoPath.toLowerCase(), JSON.stringify(cacheRecord));
+
+      const historyStore = getStore('score-history');
+      const date = new Date().toISOString().slice(0, 10);
+      const historyEntry = {
+        repo: repoPath,
+        date,
+        composite: result.composite,
+        tier: result.tier,
+        mode: result.mode,
+        dimensions: result.dimensions || {},
+        stars: result.meta?.stars || 0,
+        isSkill: result.mode === 'skills',
+        scannedAt: result.scannedAt,
+      };
+      await historyStore.set(`${repoPath.toLowerCase()}:${date}`, JSON.stringify(historyEntry));
+    } catch {}
+
     // --- Check certification status ---
     let certified = false;
     try {
