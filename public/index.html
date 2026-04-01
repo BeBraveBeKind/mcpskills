@@ -198,8 +198,12 @@
        RESULTS
        ============================================================ */
     #results { display: none; margin-top: var(--sp-5); }
+    #results.is-active { display: block; }
 
-    .loading { text-align: center; padding: var(--sp-6); color: var(--text2); }
+    .loading {
+      text-align: center; padding: var(--sp-6); color: var(--text2);
+      animation: fadeIn 0.2s ease forwards;
+    }
     .scan-spinner {
       display: inline-block; position: relative;
       width: 36px; height: 36px; vertical-align: middle; margin-right: 12px;
@@ -226,11 +230,26 @@
     @keyframes dotPulse { 0%,100% { opacity:1; transform: translate(-50%,-50%) scale(1); } 50% { opacity:0.4; transform: translate(-50%,-50%) scale(0.6); } }
     #scanStatusText { transition: opacity 0.15s ease; }
 
+    /* Fade transitions for result states */
+    .fade-enter {
+      animation: resultFadeIn 0.35s cubic-bezier(0.22,1,0.36,1) forwards;
+    }
+    .fade-exit {
+      animation: resultFadeOut 0.15s ease forwards;
+    }
+    @keyframes resultFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes resultFadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(-4px); }
+    }
+
     .result-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px; overflow: hidden;
-      animation: fadeIn 0.3s ease forwards;
     }
     .result-header {
       padding: var(--sp-5);
@@ -1147,6 +1166,29 @@ const TIER_ICONS = {
   blocked: `<svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="7.5" fill="none" stroke="var(--red)" stroke-width="1.5"/><path d="M8 8l6 6M14 8l-6 6" stroke="var(--red)" stroke-width="1.5" stroke-linecap="round"/></svg>`,
 };
 
+// --- Transition helpers ---
+function showEl(el, displayVal = 'block') {
+  if (!el) return;
+  el.style.display = displayVal;
+  el.classList.remove('fade-exit');
+  el.classList.add('fade-enter');
+}
+function hideEl(el) {
+  if (!el || el.style.display === 'none') return;
+  el.classList.remove('fade-enter');
+  el.classList.add('fade-exit');
+  el.addEventListener('animationend', function handler() {
+    el.style.display = 'none';
+    el.classList.remove('fade-exit');
+    el.removeEventListener('animationend', handler);
+  }, { once: true });
+}
+function hideElInstant(el) {
+  if (!el) return;
+  el.style.display = 'none';
+  el.classList.remove('fade-enter', 'fade-exit');
+}
+
 // --- State ---
 let currentResult = null;
 
@@ -1205,9 +1247,9 @@ async function runScan() {
   if (!repo) { showError('Enter a valid repo: owner/repo or a GitHub URL'); return; }
 
   document.getElementById('results').style.display = 'block';
-  document.getElementById('loadingState').style.display = 'block';
-  document.getElementById('resultCard').style.display = 'none';
-  document.getElementById('errorState').style.display = 'none';
+  showEl(document.getElementById('loadingState'));
+  hideElInstant(document.getElementById('resultCard'));
+  hideElInstant(document.getElementById('errorState'));
   document.getElementById('scanBtn').disabled = true;
   document.getElementById('scanBtn').textContent = 'Scanning...';
   startScanStatusCycle();
@@ -1232,8 +1274,8 @@ async function runScan() {
     if (isPaid) {
       renderFreePreview(data);
       renderFullReport(data);
-      document.getElementById('gatedSection').style.display = 'none';
-      document.getElementById('fullReport').style.display = 'block';
+      hideElInstant(document.getElementById('gatedSection'));
+      showEl(document.getElementById('fullReport'));
     } else {
       renderFreePreview(data);
       renderGatedReport(data);
@@ -1257,7 +1299,7 @@ async function runScan() {
   } catch (err) {
     showError('Network error. Please try again.');
   } finally {
-    document.getElementById('loadingState').style.display = 'none';
+    hideEl(document.getElementById('loadingState'));
     stopScanStatusCycle();
     document.getElementById('scanBtn').disabled = false;
     document.getElementById('scanBtn').textContent = 'Scan';
@@ -1265,10 +1307,10 @@ async function runScan() {
 }
 
 function showError(msg) {
-  document.getElementById('loadingState').style.display = 'none';
+  hideElInstant(document.getElementById('loadingState'));
   const el = document.getElementById('errorState');
   el.textContent = msg;
-  el.style.display = 'block';
+  showEl(el);
 }
 
 // --- Free Preview ---
@@ -1317,9 +1359,9 @@ function renderFreePreview(data) {
   }
   preview.innerHTML = html;
 
-  document.getElementById('resultCard').style.display = 'block';
-  document.getElementById('gatedSection').style.display = 'block';
-  document.getElementById('fullReport').style.display = 'none';
+  showEl(document.getElementById('resultCard'));
+  showEl(document.getElementById('gatedSection'));
+  hideElInstant(document.getElementById('fullReport'));
 }
 
 // --- Gated Report (blurred teaser) ---
@@ -1497,8 +1539,8 @@ function handleUnlock(data) {
   } else if (data.type === 'single' && data.report) {
     currentResult = data.report;
     renderFullReport(data.report);
-    document.getElementById('gatedSection').style.display = 'none';
-    document.getElementById('fullReport').style.display = 'block';
+    hideEl(document.getElementById('gatedSection'));
+    showEl(document.getElementById('fullReport'));
   } else {
     showUnlockFallback('No report data');
   }
@@ -1520,8 +1562,8 @@ function showUnlockFallback(reason) {
 function unlockReport() {
   if (!currentResult) return;
   renderFullReport(currentResult);
-  document.getElementById('gatedSection').style.display = 'none';
-  document.getElementById('fullReport').style.display = 'block';
+  hideEl(document.getElementById('gatedSection'));
+  showEl(document.getElementById('fullReport'));
 }
 
 // --- Watch / Monitor ---
@@ -1657,10 +1699,10 @@ function runAutoDemo() {
   if (input.value.trim()) return;
   input.value = 'modelcontextprotocol/servers';
   document.getElementById('results').style.display = 'block';
-  document.getElementById('loadingState').style.display = 'block';
+  showEl(document.getElementById('loadingState'));
   startScanStatusCycle();
   setTimeout(() => {
-    document.getElementById('loadingState').style.display = 'none';
+    hideEl(document.getElementById('loadingState'));
     stopScanStatusCycle();
     currentResult = DEMO_DATA;
     renderFreePreview(DEMO_DATA);
