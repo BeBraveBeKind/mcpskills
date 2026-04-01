@@ -227,27 +227,10 @@
     .skills-callout h3 { font-size: 0.95rem; font-weight: 700; color: var(--blue); margin-bottom: 8px; }
     .skills-callout p { font-size: 0.85rem; color: var(--text2); margin-bottom: 0; line-height: 1.6; }
 
-    /* --- CTA --- */
-    .cta-box {
-      background: var(--surface); border: 1px solid var(--green);
-      border-radius: 12px; padding: 32px; margin: 40px 0; text-align: center;
-      position: relative; overflow: hidden;
-    }
-    .cta-box::before {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(52,211,153,0.06), rgba(96,165,250,0.04));
-      pointer-events: none;
-    }
-    .cta-box h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; position: relative; }
-    .cta-box p { margin-bottom: 16px; position: relative; font-size: 0.9rem; color: var(--text2); }
-    .cta-btn {
-      display: inline-block; background: var(--green); color: #000;
-      font-weight: 600; padding: 12px 32px; border-radius: 8px;
-      text-decoration: none; font-size: 0.95rem; position: relative;
-      transition: all 0.2s; border: none;
-    }
-    .cta-btn:hover { opacity: 0.9; transform: translateY(-1px); border-bottom: none; text-decoration: none; }
-    .cta-sub { margin-top: 10px; font-size: 0.8rem; color: var(--text3); position: relative; }
+    /* --- CTA (uses shared .article-cta, minor overrides) --- */
+    .article-cta { padding: var(--sp-6); margin: var(--sp-7) 0; }
+    .article-cta h3 { font-size: 1.15rem; }
+    .cta-sub { margin-top: 10px; font-size: 0.8rem; color: var(--text3); }
 
     /* --- RESPONSIVE --- */
     @media (max-width: 640px) {
@@ -517,10 +500,10 @@
 
   <p>Scores are not permanent. They reflect the state of the repo at scan time. A repo that ships a security patch or improves its README will score differently on the next scan.</p>
 
-  <div class="cta-box">
+  <div class="article-cta">
     <h3>Score your stack</h3>
     <p>Paste any GitHub repo and get a trust score in seconds.</p>
-    <a href="https://mcpskills.io" class="cta-btn">Scan Now — Free</a>
+    <a href="https://mcpskills.io" class="cta-btn">Scan Now &mdash; Free</a>
     <div class="cta-sub">Full reports with all 14 signals for $9 &middot; 10-pack for $29</div>
   </div>
 

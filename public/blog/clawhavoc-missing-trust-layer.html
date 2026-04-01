@@ -40,22 +40,8 @@
   <style>
     article p { font-size: 0.92rem; }
     article h2 { font-size: 1.25rem; }
-    article li::before { content: '\2192'; color: var(--green); }
+    article li::before { content: '\2013'; color: var(--green); }
     article blockquote p { margin: 0; font-style: italic; }
-
-    .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
-    .comparison-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
-    .comparison-box h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; }
-    .comparison-box p { font-size: 0.82rem; margin-bottom: 6px; }
-    .comparison-good { border-color: var(--green); }
-    .comparison-bad { border-color: var(--red); }
-
-    .cta-box { background: linear-gradient(135deg, rgba(63,185,80,0.1), rgba(88,166,255,0.1)); border: 1px solid var(--green); border-radius: 10px; padding: 24px; margin: 32px 0; text-align: center; }
-    .cta-box p { margin-bottom: 12px; }
-    .cta-btn { display: inline-block; background: var(--green); color: #000; font-weight: 600; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-size: 0.9rem; }
-    .cta-btn:hover { opacity: 0.9; text-decoration: none; }
-
-    @media (max-width: 600px) { .comparison { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -164,9 +150,10 @@
 
   <p>If you care about AI agent security, I'd love to hear what you think. What signals matter most to you when evaluating a skill?</p>
 
-  <div class="cta-box">
-    <p><strong>Score your AI skills.</strong> Paste any GitHub repo URL and get a trust score in seconds.</p>
-    <a href="https://mcpskills.io" class="cta-btn">Scan Now — Free</a>
+  <div class="article-cta">
+    <h3>Score your AI skills</h3>
+    <p>Paste any GitHub repo URL and get a trust score in seconds.</p>
+    <a href="https://mcpskills.io" class="cta-btn">Scan Now &mdash; Free</a>
   </div>
 
 </div></article>
