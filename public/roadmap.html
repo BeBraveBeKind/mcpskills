@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roadmap — MCP Skills</title>
+  <meta name="description" content="What we're building next at MCP Skills. Runtime monitoring, tool call auditing, expanded coverage, and more.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .roadmap-hero { text-align: center; padding: var(--sp-7) 0 var(--sp-6); }
+    .roadmap-hero h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: var(--sp-3); }
+    .roadmap-hero p { color: var(--text2); font-size: 0.95rem; max-width: 500px; margin: 0 auto; }
+
+    .roadmap-section { margin-bottom: var(--sp-7); }
+    .roadmap-section h2 {
+      font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; margin-bottom: var(--sp-4);
+      display: flex; align-items: center; gap: var(--sp-2);
+    }
+    .phase-badge {
+      display: inline-block; padding: 2px 10px; border-radius: 4px;
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .phase-live { background: var(--green-bg); color: var(--green); }
+    .phase-building { background: var(--amber-bg); color: var(--amber); }
+    .phase-planned { background: var(--blue-bg); color: var(--blue); }
+    .phase-exploring { background: var(--purple-bg); color: var(--purple); }
+
+    .roadmap-items { display: grid; gap: var(--sp-3); }
+    .roadmap-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: var(--sp-4) var(--sp-5);
+      display: flex; gap: var(--sp-4); align-items: flex-start;
+    }
+    .roadmap-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .roadmap-icon svg { width: 16px; height: 16px; }
+    .roadmap-item h3 { font-size: 0.92rem; font-weight: 600; margin-bottom: 4px; }
+    .roadmap-item p { font-size: 0.82rem; color: var(--text2); margin: 0; line-height: 1.55; }
+
+    .roadmap-cta {
+      text-align: center; padding: var(--sp-6) 0;
+      border-top: 1px solid var(--border); margin-top: var(--sp-6);
+    }
+    .roadmap-cta p { font-size: 0.88rem; color: var(--text2); margin-bottom: var(--sp-3); }
+    .roadmap-cta a { color: var(--blue); font-weight: 500; }
+  </style>
+</head>
+<body>
+
+<nav><div class="container nav-inner">
+  <a href="/" class="logo">
+    <span class="logo-mark">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M5 8L7.5 10.5L12 5.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    MCP Skills
+  </a>
+  <div class="nav-links">
+    <a href="/">Scanner</a>
+    <a href="/#methodology">How it works</a>
+    <a href="/blog/state-of-ai-skill-security">Research</a>
+  </div>
+</div></nav>
+
+<div class="container">
+  <div class="roadmap-hero">
+    <h1>Roadmap</h1>
+    <p>Where MCP Skills is headed. We build in public and ship weekly.</p>
+  </div>
+
+  <!-- LIVE -->
+  <div class="roadmap-section">
+    <h2><span class="phase-badge phase-live">Live</span> Shipped and running</h2>
+    <div class="roadmap-items">
+      <div class="roadmap-item">
+        <div class="roadmap-icon" style="background:var(--green-bg);">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <h3>14-signal trust scoring</h3>
+          <p>Static analysis across 4 dimensions (Alive, Legit, Solid, Usable) with Skills Mode for MCP servers and AI agent skills.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-icon" style="background:var(--green-bg);">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <h3>MCP server + API</h3>
+          <p>Score repos from Claude Code, Cursor, or any MCP client. Agent-optimized API with go/no-go decisions. Free and Pro tiers.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-icon" style="background:var(--green-bg);">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <h3>Nightly crawl + daily scan</h3>
+          <p>Automated discovery of new MCP servers from registries and GitHub. Daily re-scoring of monitored repos with email alerts.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-icon" style="background:var(--green-bg);">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <h3>Audit logging</h3>
+          <p>Every API call logged with privacy-safe IP hashing, API key prefix, result tier, and timestamp. Daily log rotation.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-icon" style="background:var(--green-bg);">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <h3>Certified Safe badge program</h3>
+          <p>Semi-automated certification for repos meeting trust thresholds. Gold badge for READMEs, fast-path trust for agents.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUILDING -->
+  <div class="roadmap-section">
+    <h2><span class="phase-badge phase-building">Building</span> In progress</h2>
+    <div class="roadmap-items">
+      <div class="roadmap-item">
+        <div class="roadmap-icon" style="background:var(--amber-bg);">
+          <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="var(--amber)" stroke-width="1.5" fill="none"/><path d="M8 5v3.5l2 1" stroke="var(--amber)" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <h3>Weekly security digest</h3>
+          <p>Automated analysis of all scored repos: tier trends, score changes, new discoveries, security concerns. Published weekly.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-icon" style="background:var(--amber-bg);">
+          <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="var(--amber)" stroke-width="1.5" fill="none"/><path d="M8 5v3.5l2 1" stroke="var(--amber)" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <h3>Registry-scale scanning</h3>
+          <p>Score every server in the MCP Registry and major marketplaces. Target: 500+ repos with nightly freshness.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLANNED -->
+  <div class="roadmap-section">
+    <h2><span class="phase-badge phase-planned">Planned</span> Next quarter</h2>
+    <div class="roadmap-items">
+      <div class="roadmap-item">
+        <div class="roadmap-icon" style="background:var(--blue-bg);">
+          <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="3" stroke="var(--blue)" stroke-width="1.3"/><path d="M5 8h6M8 5v6" stroke="var(--blue)" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <h3>Tool call policy enforcement</h3>
+          <p>Define and enforce policies for which tools an AI skill can call. Block dangerous tool combinations before they execute.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-icon" style="background:var(--blue-bg);">
+          <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="3" stroke="var(--blue)" stroke-width="1.3"/><path d="M5 8h6M8 5v6" stroke="var(--blue)" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <h3>CI/CD integration</h3>
+          <p>GitHub Action and CLI tool to block untrusted skills in pull requests. Enforce trust thresholds before merge.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-icon" style="background:var(--blue-bg);">
+          <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="3" stroke="var(--blue)" stroke-width="1.3"/><path d="M5 8h6M8 5v6" stroke="var(--blue)" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <h3>Comparison pages</h3>
+          <p>Head-to-head trust comparisons (e.g., "Vigile AI vs MCP Skills") for SEO and buyer education.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPLORING -->
+  <div class="roadmap-section">
+    <h2><span class="phase-badge phase-exploring">Exploring</span> Research phase</h2>
+    <div class="roadmap-items">
+      <div class="roadmap-item">
+        <div class="roadmap-icon" style="background:var(--purple-bg);">
+          <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="var(--purple)" stroke-width="1.3" fill="none"/><path d="M8 5v2M6.5 9.5a1.5 1.5 0 1 0 3 0" stroke="var(--purple)" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <h3>Runtime behavior monitoring</h3>
+          <p>Sandbox execution to detect context leaks, dynamic payload fetching, and multi-step agent chain attacks that static analysis can't catch.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-icon" style="background:var(--purple-bg);">
+          <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="var(--purple)" stroke-width="1.3" fill="none"/><path d="M8 5v2M6.5 9.5a1.5 1.5 0 1 0 3 0" stroke="var(--purple)" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <h3>OpenClaw integration</h3>
+          <p>Parse SKILL.md YAML frontmatter for security transparency scoring. Reward repos that declare permissions and credential scopes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="roadmap-cta">
+    <p>Have feedback or feature requests? Email <a href="mailto:hello@mcpskills.io">hello@mcpskills.io</a> or open an issue on <a href="https://github.com/BeBraveBeKind/mcpskills" target="_blank">GitHub</a>.</p>
+  </div>
+</div>
+
+<footer class="footer-simple"><div class="container">
+  <p>&copy; 2026 <a href="https://rise-above.net">Rise Above Partners</a>. Built by <a href="https://www.linkedin.com/in/michaelbrowne03/" target="_blank">Michael Browne</a>. <a href="/privacy">Privacy</a> &middot; <a href="/terms">Terms</a></p>
+</div></footer>
+
+</body>
+</html>

@@ -39,6 +39,11 @@
   status = 200
 
 [[redirects]]
+  from = "/roadmap"
+  to = "/roadmap.html"
+  status = 200
+
+[[redirects]]
   from = "/certify"
   to = "/certify.html"
   status = 200
