@@ -51,7 +51,8 @@
       { "@type": "Question", "name": "How does MCP Skills trust scoring work?", "acceptedAnswer": { "@type": "Answer", "text": "Every repo is evaluated across 4 dimensions — Alive (is it maintained?), Legit (who made it?), Solid (is it secure?), and Usable (can I work with it?). Each dimension combines multiple signals from the GitHub API, OpenSSF Scorecard, and our analysis engine to produce a composite score from 0 to 10." } },
       { "@type": "Question", "name": "What is Skills Mode?", "acceptedAnswer": { "@type": "Answer", "text": "When MCP Skills detects an AI agent skill or MCP server, the algorithm shifts to Skills Mode. Security weight increases and two additional signals activate: Skill Spec Compliance and Tool Safety. The safety scanner checks for prompt injection, shell execution, credential access, network exfiltration, and obfuscated payloads — the exact attack patterns used in ClawHavoc." } },
       { "@type": "Question", "name": "What are the trust tiers?", "acceptedAnswer": { "@type": "Answer", "text": "Repos are assigned one of three trust tiers: Verified (score 7.5+ with strong dimensions — safe to build on), Established (score 4.5+ — solid but check the details), or New (below threshold — promising but unproven). A fourth tier, Blocked, applies when critical safety concerns are detected." } },
-      { "@type": "Question", "name": "Is the free scan really free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Free scans show the trust tier badge, all 4 dimension scores, and a one-line rationale. Unlimited scans, no account required. Paid reports ($9 per scan or $29 for a 10-pack) unlock the full 12-signal breakdown and detailed safety scan findings." } }
+      { "@type": "Question", "name": "Is the free scan really free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Free scans show the trust tier badge, all 4 dimension scores, and a one-line rationale. Unlimited scans, no account required. Paid reports ($9 per scan or $29 for a 10-pack) unlock the full 12-signal breakdown and detailed safety scan findings." } },
+      { "@type": "Question", "name": "What are the limitations of trust scoring?", "acceptedAnswer": { "@type": "Answer", "text": "MCP Skills performs static analysis — source code pattern matching, GitHub metadata, and OpenSSF Scorecard data. It does not yet monitor runtime behavior, multi-step agent chain context leaks, or dynamically fetched payloads. A high score means strong static indicators, but no automated tool catches everything. Runtime observability and tool call auditing are on our roadmap." } }
     ]
   }
   </script>
@@ -500,7 +501,43 @@
     .skills-source { font-size: 0.72rem; color: var(--text3); margin-top: 10px; display: block; }
     .skills-source a { color: var(--blue); text-decoration: none; }
 
+    /* Scope transparency section */
+    .scope-section {
+      margin-top: var(--sp-6); padding: var(--sp-5);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .scope-section h3 {
+      font-size: 0.95rem; font-weight: 700; margin-bottom: var(--sp-4);
+      text-align: center;
+    }
+    .scope-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: var(--sp-5);
+    }
+    .scope-col h4 {
+      font-size: 0.82rem; font-weight: 600;
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: var(--sp-3);
+    }
+    .scope-do h4 { color: var(--green); }
+    .scope-dont h4 { color: var(--text3); }
+    .scope-col ul { list-style: none; }
+    .scope-col li {
+      font-size: 0.78rem; color: var(--text2);
+      padding: 3px 0 3px 14px; position: relative; line-height: 1.5;
+    }
+    .scope-do li::before { content: '\2713'; position: absolute; left: 0; color: var(--green); font-size: 0.7rem; }
+    .scope-dont li::before { content: '\2014'; position: absolute; left: 0; color: var(--text3); font-size: 0.7rem; }
+    .scope-note {
+      margin-top: var(--sp-4); padding-top: var(--sp-3);
+      border-top: 1px solid var(--border);
+      font-size: 0.78rem; color: var(--text3); line-height: 1.6;
+      text-align: center;
+    }
+
     @media (max-width: 600px) {
+      .scope-grid { grid-template-columns: 1fr; }
       .dim-item { flex-direction: column; gap: 8px; }
       .dim-accent { width: 100%; height: 3px; }
     }
@@ -960,6 +997,38 @@
       </div>
       <span class="skills-source">Patterns from <a href="https://blog.trailofbits.com/2025/01/09/clawhavoc-mcp-supply-chain-attack/">ClawHavoc</a> and <a href="https://arxiv.org/abs/2504.03767">ToxicSkills</a></span>
     </div>
+  </div>
+
+  <div class="scope-section">
+    <h3>What we check &mdash; and what we don't</h3>
+    <div class="scope-grid">
+      <div class="scope-col scope-do">
+        <h4>
+          <svg class="icon-svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Static analysis
+        </h4>
+        <ul>
+          <li>Source code pattern matching across 20 files</li>
+          <li>GitHub metadata: commits, issues, contributors, releases</li>
+          <li>OpenSSF Scorecard security posture</li>
+          <li>Dependency health and supply chain signals</li>
+          <li>Spec compliance and documentation quality</li>
+        </ul>
+      </div>
+      <div class="scope-col scope-dont">
+        <h4>
+          <svg class="icon-svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="var(--text3)" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Not yet covered
+        </h4>
+        <ul>
+          <li>Runtime behavior monitoring (sandbox execution)</li>
+          <li>Multi-step agent chain context leaks</li>
+          <li>Dynamic payloads fetched after install</li>
+          <li>Tool call audit logging and policy enforcement</li>
+        </ul>
+      </div>
+    </div>
+    <p class="scope-note">Trust scoring is a signal, not a verdict. A high score means strong static indicators across all dimensions &mdash; but no automated tool catches everything. Runtime observability and tool call auditing are on our roadmap.</p>
   </div>
 </div></section>
 
