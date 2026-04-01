@@ -1,0 +1,13 @@
+test/
+*.test.js
+*.spec.js
+.github/
+.gitignore
+CONTRIBUTING.md
+SECURITY.md
+SKILL.md
+mockups/
+docs/
+scripts/
+*.mp4
+*.mov

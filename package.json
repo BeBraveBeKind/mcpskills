@@ -1,7 +1,14 @@
 {
   "name": "mcpskills",
-  "version": "0.1.0",
-  "description": "Trust-scored MCP servers and AI agent skills",
+  "version": "2.1.0",
+  "description": "Trust-score any AI skill or MCP server. 14 signals, safety scanning, recommendations, badges, monitoring.",
+  "author": "Michael Browne <hello@mcpskills.io> (https://mcpskills.io)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BeBraveBeKind/mcpskills.git"
+  },
+  "homepage": "https://mcpskills.io",
   "scripts": {
     "scan": "node scripts/scan.js",
     "dev": "netlify dev",

@@ -17,3 +17,14 @@ service-account.json
 *.mov
 *.avi
 video/
+mockups/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Coverage
+coverage/
+.nyc_output/
