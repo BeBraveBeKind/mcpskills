@@ -13,6 +13,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -37,36 +38,10 @@
   }
   </script>
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    :root {
-      --bg: #0D1117; --surface: #161B22;
-      --border: #30363D;
-      --text: #E6EDF3; --text2: #8B949E; --text3: #6E7681;
-      --green: #3FB950; --blue: #58A6FF; --yellow: #E3B341; --red: #F85149;
-    }
-    body { background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; line-height: 1.7; }
-    .container { max-width: 720px; margin: 0 auto; padding: 0 20px; }
-    nav { padding: 16px 0; border-bottom: 1px solid var(--border); }
-    nav .container { display: flex; justify-content: space-between; align-items: center; }
-    .logo { font-size: 1.1rem; font-weight: 700; color: var(--text); text-decoration: none; }
-    .logo span { color: var(--green); }
-    .nav-links { display: flex; gap: 20px; }
-    .nav-links a { color: var(--text2); text-decoration: none; font-size: 0.85rem; font-weight: 500; }
-    .nav-links a:hover { color: var(--text); }
-
-    article { padding: 48px 0 64px; }
-    article h1 { font-size: 2rem; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.03em; line-height: 1.2; }
-    .meta { font-size: 0.82rem; color: var(--text3); margin-bottom: 32px; }
-    .meta a { color: var(--blue); text-decoration: none; }
-    article h2 { font-size: 1.25rem; font-weight: 600; margin: 36px 0 12px; color: var(--text); }
-    article p { font-size: 0.92rem; color: var(--text2); margin-bottom: 16px; }
-    article a { color: var(--blue); }
-    article strong { color: var(--text); }
-    article blockquote { border-left: 3px solid var(--green); padding: 12px 16px; margin: 20px 0; background: var(--surface); border-radius: 0 8px 8px 0; }
+    article p { font-size: 0.92rem; }
+    article h2 { font-size: 1.25rem; }
+    article li::before { content: '\2192'; color: var(--green); }
     article blockquote p { margin: 0; font-style: italic; }
-    article ul { list-style: none; margin-bottom: 16px; }
-    article li { font-size: 0.88rem; color: var(--text2); padding: 4px 0 4px 20px; position: relative; }
-    article li::before { content: '→'; position: absolute; left: 0; color: var(--green); }
 
     .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
     .comparison-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
@@ -78,18 +53,20 @@
     .cta-box { background: linear-gradient(135deg, rgba(63,185,80,0.1), rgba(88,166,255,0.1)); border: 1px solid var(--green); border-radius: 10px; padding: 24px; margin: 32px 0; text-align: center; }
     .cta-box p { margin-bottom: 12px; }
     .cta-btn { display: inline-block; background: var(--green); color: #000; font-weight: 600; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-size: 0.9rem; }
-    .cta-btn:hover { opacity: 0.9; }
+    .cta-btn:hover { opacity: 0.9; text-decoration: none; }
 
-    footer { padding: 32px 0; border-top: 1px solid var(--border); text-align: center; }
-    footer p { font-size: 0.78rem; color: var(--text3); }
-    footer a { color: var(--text2); }
     @media (max-width: 600px) { .comparison { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
 
-<nav><div class="container">
-  <a href="/" class="logo">MCP <span>Skills</span></a>
+<nav><div class="container nav-inner">
+  <a href="/" class="logo">
+    <span class="logo-mark">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M5 8L7.5 10.5L12 5.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    MCP Skills
+  </a>
   <div class="nav-links">
     <a href="/">Scanner</a>
     <a href="/#methodology">How it works</a>
@@ -194,8 +171,8 @@
 
 </div></article>
 
-<footer><div class="container">
-  <p>Built by <a href="https://www.linkedin.com/in/michaelbrowne03/">Michael Browne</a> at <a href="https://rise-above.net">Rise Above Partners LLC</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="/terms">Terms</a></p>
+<footer class="footer-simple"><div class="container">
+  <p>&copy; 2026 <a href="https://rise-above.net">Rise Above Partners</a>. Built by <a href="https://www.linkedin.com/in/michaelbrowne03/" target="_blank">Michael Browne</a>. <a href="/privacy">Privacy</a> &middot; <a href="/terms">Terms</a></p>
 </div></footer>
 
 </body>

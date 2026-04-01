@@ -13,6 +13,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -37,33 +38,14 @@
   }
   </script>
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    :root {
-      --bg: #0D1117; --surface: #161B22; --surface2: #1C2128;
-      --border: #30363D; --border-light: #3D444D;
-      --text: #E6EDF3; --text2: #8B949E; --text3: #6E7681;
-      --green: #3FB950; --green-bg: rgba(63,185,80,0.12);
-      --amber: #D29922; --amber-bg: rgba(210,153,34,0.12);
-      --blue: #58A6FF; --blue-bg: rgba(88,166,255,0.12);
-      --red: #F85149; --red-bg: rgba(248,81,73,0.12);
-      --purple: #A371F7; --purple-bg: rgba(163,113,247,0.12);
-    }
-    body { background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; line-height: 1.7; overflow-x: hidden; }
-
     /* --- READING PROGRESS --- */
     .progress-bar {
       position: fixed; top: 0; left: 0; height: 2px; background: var(--green);
       width: 0%; z-index: 100; transition: width 0.1s linear;
     }
 
-    /* --- NAV --- */
-    nav { padding: 16px 0; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(13,17,23,0.95); backdrop-filter: blur(12px); z-index: 50; }
-    nav .container { display: flex; justify-content: space-between; align-items: center; max-width: 720px; margin: 0 auto; padding: 0 20px; }
-    .logo { font-size: 1.1rem; font-weight: 700; color: var(--text); text-decoration: none; }
-    .logo span { color: var(--green); }
-    .nav-links { display: flex; gap: 20px; }
-    .nav-links a { color: var(--text2); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.2s; }
-    .nav-links a:hover { color: var(--text); }
+    /* --- NAV (sticky override) --- */
+    nav { position: sticky; top: 0; background: rgba(10,14,20,0.95); backdrop-filter: blur(12px); z-index: 50; }
 
     /* --- ARTICLE HERO --- */
     .article-hero {
@@ -73,10 +55,10 @@
     .article-hero::before {
       content: ''; position: absolute; top: -60px; right: -100px;
       width: 400px; height: 400px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(63,185,80,0.04) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(52,211,153,0.04) 0%, transparent 70%);
       pointer-events: none;
     }
-    .article-hero .container { max-width: 720px; margin: 0 auto; padding: 0 20px; position: relative; }
+    .article-hero .container { position: relative; }
     .article-badge {
       display: inline-flex; align-items: center; gap: 6px;
       background: var(--green-bg); color: var(--green); font-size: 0.75rem;
@@ -101,7 +83,6 @@
     }
     .article-meta a { color: var(--blue); text-decoration: none; }
     .article-meta .divider { width: 3px; height: 3px; border-radius: 50%; background: var(--text3); }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
     /* --- ARTICLE BODY --- */
     .article-body { max-width: 720px; margin: 0 auto; padding: 40px 20px 64px; }
@@ -112,13 +93,9 @@
     }
     .article-body h3 { font-size: 1.05rem; font-weight: 600; margin: 28px 0 10px; color: var(--text); }
     .article-body p { font-size: 0.92rem; color: var(--text2); margin-bottom: 18px; }
-    .article-body a { color: var(--blue); text-decoration: none; border-bottom: 1px solid rgba(88,166,255,0.3); transition: border-color 0.2s; }
-    .article-body a:hover { border-color: var(--blue); }
+    .article-body a { color: var(--blue); text-decoration: none; border-bottom: 1px solid rgba(96,165,250,0.3); transition: border-color 0.2s; }
+    .article-body a:hover { border-color: var(--blue); text-decoration: none; }
     .article-body strong { color: var(--text); }
-    .article-body blockquote {
-      border-left: 3px solid var(--green); padding: 14px 20px; margin: 24px 0;
-      background: var(--surface); border-radius: 0 8px 8px 0;
-    }
     .article-body blockquote p { margin: 0; font-style: italic; color: var(--text2); }
 
     /* --- SCORE TABLE (desktop) --- */
@@ -126,17 +103,15 @@
       margin: 28px 0; border: 1px solid var(--border); border-radius: 12px;
       overflow: hidden; background: var(--surface);
     }
-    .score-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .score-table { font-size: 0.85rem; }
     .score-table thead { background: var(--bg); }
     .score-table th {
-      text-align: left; padding: 12px 16px; color: var(--text3);
-      font-weight: 600; font-size: 0.75rem; text-transform: uppercase;
-      letter-spacing: 0.5px; border-bottom: 1px solid var(--border);
+      padding: 12px 16px; letter-spacing: 0.5px; border-bottom: 1px solid var(--border);
     }
-    .score-table td { padding: 14px 16px; border-bottom: 1px solid var(--border); color: var(--text2); }
+    .score-table td { padding: 14px 16px; }
     .score-table tbody tr:last-child td { border-bottom: none; }
     .score-table tbody tr { transition: background 0.15s; }
-    .score-table tbody tr:hover td { background: rgba(63,185,80,0.03); }
+    .score-table tbody tr:hover td { background: rgba(52,211,153,0.03); }
     .score-table .repo-name { color: var(--text); font-weight: 500; }
 
     /* Score bar inline */
@@ -191,7 +166,7 @@
     .finding-card:nth-child(5) { transition-delay: 0.32s; }
     .finding-num {
       position: absolute; top: -8px; right: 16px;
-      font-size: 4rem; font-weight: 800; color: rgba(63,185,80,0.06);
+      font-size: 4rem; font-weight: 800; color: rgba(52,211,153,0.06);
       line-height: 1; pointer-events: none;
     }
     .finding-title {
@@ -236,7 +211,7 @@
 
     /* --- SKILLS MODE CALLOUT --- */
     .skills-callout {
-      background: var(--blue-bg); border: 1px solid rgba(88,166,255,0.2);
+      background: var(--blue-bg); border: 1px solid rgba(96,165,250,0.2);
       border-radius: 12px; padding: 24px 28px; margin: 28px 0;
       position: relative; overflow: hidden;
       opacity: 0; transform: translateY(16px);
@@ -246,7 +221,7 @@
     .skills-callout::before {
       content: ''; position: absolute; top: -20px; right: -20px;
       width: 120px; height: 120px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(88,166,255,0.08) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(96,165,250,0.08) 0%, transparent 70%);
       pointer-events: none;
     }
     .skills-callout h3 { font-size: 0.95rem; font-weight: 700; color: var(--blue); margin-bottom: 8px; }
@@ -260,7 +235,7 @@
     }
     .cta-box::before {
       content: ''; position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(63,185,80,0.06), rgba(88,166,255,0.04));
+      background: linear-gradient(135deg, rgba(52,211,153,0.06), rgba(96,165,250,0.04));
       pointer-events: none;
     }
     .cta-box h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; position: relative; }
@@ -271,14 +246,8 @@
       text-decoration: none; font-size: 0.95rem; position: relative;
       transition: all 0.2s; border: none;
     }
-    .cta-btn:hover { opacity: 0.9; transform: translateY(-1px); border-bottom: none; }
+    .cta-btn:hover { opacity: 0.9; transform: translateY(-1px); border-bottom: none; text-decoration: none; }
     .cta-sub { margin-top: 10px; font-size: 0.8rem; color: var(--text3); position: relative; }
-
-    /* --- FOOTER --- */
-    footer { padding: 32px 0; border-top: 1px solid var(--border); text-align: center; }
-    footer .container { max-width: 720px; margin: 0 auto; padding: 0 20px; }
-    footer p { font-size: 0.78rem; color: var(--text3); }
-    footer a { color: var(--text2); text-decoration: none; }
 
     /* --- RESPONSIVE --- */
     @media (max-width: 640px) {
@@ -296,12 +265,17 @@
 
 <div class="progress-bar" id="progressBar"></div>
 
-<nav><div class="container">
-  <a href="/" class="logo">MCP <span>Skills</span></a>
+<nav><div class="container nav-inner">
+  <a href="/" class="logo">
+    <span class="logo-mark">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M5 8L7.5 10.5L12 5.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    MCP Skills
+  </a>
   <div class="nav-links">
     <a href="/">Scanner</a>
     <a href="/#methodology">How it works</a>
-    <a href="/blog/clawhavoc-missing-trust-layer">Blog</a>
+    <a href="/blog/state-of-ai-skill-security">Research</a>
   </div>
 </div></nav>
 
@@ -552,8 +526,8 @@
 
 </div>
 
-<footer><div class="container">
-  <p>Built by <a href="https://www.linkedin.com/in/michaelbrowne03/">Michael Browne</a> at <a href="https://rise-above.net">Rise Above Partners LLC</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="/terms">Terms</a></p>
+<footer class="footer-simple"><div class="container">
+  <p>&copy; 2026 <a href="https://rise-above.net">Rise Above Partners</a>. Built by <a href="https://www.linkedin.com/in/michaelbrowne03/" target="_blank">Michael Browne</a>. <a href="/privacy">Privacy</a> &middot; <a href="/terms">Terms</a></p>
 </div></footer>
 
 <script>

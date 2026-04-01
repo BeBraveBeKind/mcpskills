@@ -5,43 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Terms of Service — MCP Skills</title>
   <meta name="description" content="Terms of service for MCP Skills trust scanner.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    :root {
-      --bg: #0D1117; --surface: #161B22;
-      --border: #30363D;
-      --text: #E6EDF3; --text2: #8B949E; --text3: #6E7681;
-      --green: #3FB950; --blue: #58A6FF;
-    }
-    body { background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; line-height: 1.7; }
-    .container { max-width: 680px; margin: 0 auto; padding: 0 20px; }
-    nav { padding: 16px 0; border-bottom: 1px solid var(--border); }
-    nav .container { display: flex; justify-content: space-between; align-items: center; }
-    .logo { font-size: 1.1rem; font-weight: 700; color: var(--text); text-decoration: none; }
-    .logo span { color: var(--green); }
-    .nav-links { display: flex; gap: 20px; }
-    .nav-links a { color: var(--text2); text-decoration: none; font-size: 0.85rem; font-weight: 500; }
-    .nav-links a:hover { color: var(--text); }
-    .content { padding: 48px 0 64px; }
-    .content h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.02em; }
-    .content .updated { font-size: 0.82rem; color: var(--text3); margin-bottom: 32px; }
-    .content h2 { font-size: 1.1rem; font-weight: 600; margin: 28px 0 10px; color: var(--text); }
-    .content p { font-size: 0.88rem; color: var(--text2); margin-bottom: 12px; }
-    .content ul { list-style: none; margin-bottom: 12px; }
-    .content li { font-size: 0.85rem; color: var(--text2); padding: 3px 0; padding-left: 16px; position: relative; }
-    .content li::before { content: '-'; position: absolute; left: 0; color: var(--text3); }
-    .content a { color: var(--blue); }
-    footer { padding: 32px 0; border-top: 1px solid var(--border); text-align: center; }
-    footer p { font-size: 0.78rem; color: var(--text3); }
-    footer a { color: var(--text2); }
-  </style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
 
-<nav><div class="container">
-  <a href="/" class="logo">MCP <span>Skills</span></a>
+<nav><div class="container nav-inner">
+  <a href="/" class="logo">
+    <span class="logo-mark">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M5 8L7.5 10.5L12 5.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    MCP Skills
+  </a>
   <div class="nav-links">
     <a href="/">Scanner</a>
     <a href="/privacy">Privacy</a>
@@ -93,8 +70,8 @@
 
 </div></section>
 
-<footer><div class="container">
-  <p>Built by <a href="https://www.linkedin.com/in/michaelbrowne03/" target="_blank">Michael Browne</a> at <a href="https://rise-above.net">Rise Above Partners</a> · <a href="mailto:hello@mcpskills.io">hello@mcpskills.io</a></p>
+<footer class="footer-simple"><div class="container">
+  <p>&copy; 2026 <a href="https://rise-above.net">Rise Above Partners</a>. Built by <a href="https://www.linkedin.com/in/michaelbrowne03/" target="_blank">Michael Browne</a>. <a href="/privacy">Privacy</a> &middot; <a href="/terms">Terms</a></p>
 </div></footer>
 
 </body>

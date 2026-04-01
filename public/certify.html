@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Certified Safe — MCP Skills</title>
+  <meta name="description" content="Apply for the MCP Skills Certified Safe badge. Prove your AI skill or MCP server meets our trust standards.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    /* Page-specific: certify */
+    .certify-hero { text-align: center; padding: var(--sp-7) 0 var(--sp-6); }
+    .certify-hero h1 { font-size: 2rem; font-weight: 700; margin-bottom: var(--sp-3); }
+    .certify-hero h1 span { color: var(--gold); }
+    .certify-hero p { color: var(--text2); font-size: 1rem; max-width: 480px; margin: 0 auto; }
+
+    .certify-note { margin-top: var(--sp-3); font-size: 0.82rem; color: var(--text3); }
+
+    #result { margin-top: var(--sp-4); padding: var(--sp-4); border-radius: 8px; display: none; font-size: 0.9rem; }
+    .result-success { background: var(--green-bg); border: 1px solid var(--green); color: var(--green); }
+    .result-error { background: var(--red-bg); border: 1px solid var(--red); color: var(--red); }
+    .result-info { background: var(--blue-bg); border: 1px solid var(--blue); color: var(--blue); }
+    .result-ineligible { background: var(--amber-bg); border: 1px solid var(--amber); color: var(--amber); }
+
+    .embed-section {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: var(--sp-5); margin: var(--sp-6) 0;
+    }
+    .embed-section h3 { font-size: 1rem; margin-bottom: var(--sp-3); }
+    .embed-section p { font-size: 0.85rem; color: var(--text2); margin-bottom: var(--sp-3); }
+    .embed-code {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 6px; padding: var(--sp-3);
+      font-family: var(--mono); font-size: 0.8rem; color: var(--text2);
+      overflow-x: auto; margin: var(--sp-2) 0;
+    }
+    .embed-note { font-size: 0.78rem; color: var(--text3); margin-top: var(--sp-2); }
+  </style>
+</head>
+<body>
+
+<nav><div class="container nav-inner">
+  <a href="/" class="logo">
+    <span class="logo-mark">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M5 8L7.5 10.5L12 5.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    MCP Skills
+  </a>
+  <div class="nav-links">
+    <a href="/">Scanner</a>
+    <a href="/#methodology">How it works</a>
+    <a href="/blog/state-of-ai-skill-security">Research</a>
+  </div>
+</div></nav>
+
+<div class="container">
+  <div class="certify-hero">
+    <h1><span>Certified Safe</span> Badge Program</h1>
+    <p>Prove your AI skill or MCP server meets the highest trust standards. Certified repos get a gold badge and fast-path trust for agents.</p>
+  </div>
+
+  <div class="form-card">
+    <h3>Requirements</h3>
+    <div class="req-list">
+      <div class="req-item"><span class="req-check">&ndash;</span> Composite score >= 7.0 / 10</div>
+      <div class="req-item"><span class="req-check">&ndash;</span> Solid (security) dimension >= 5.0 / 10</div>
+      <div class="req-item"><span class="req-check">&ndash;</span> No disqualifiers (archived, critical CVE, dangerous workflow)</div>
+      <div class="req-item"><span class="req-check">&ndash;</span> At least 8 sufficient trust signals</div>
+      <div class="req-item"><span class="req-check">&ndash;</span> Admin review with documented notes</div>
+    </div>
+    <p class="certify-note">Certification is monitored daily. If your score drops below thresholds, certification is automatically revoked.</p>
+  </div>
+
+  <div class="form-card">
+    <h3>Apply for Certification</h3>
+    <div class="form-row">
+      <label>GitHub Repo</label>
+      <input type="text" id="repoInput" placeholder="owner/repo" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="form-row">
+      <label>Maintainer Email (for status updates)</label>
+      <input type="email" id="emailInput" placeholder="you@example.com">
+    </div>
+    <button class="form-btn form-btn-gold" id="applyBtn" onclick="apply()" style="margin-top:var(--sp-2);">Check Eligibility &amp; Apply</button>
+    <div id="result"></div>
+  </div>
+
+  <div class="embed-section">
+    <h3>Embed Your Badge</h3>
+    <p>Once certified, add the gold badge to your README:</p>
+    <div class="embed-code">[![Certified Safe](https://mcpskills.io/badge/owner/repo)](https://mcpskills.io/?repo=owner/repo)</div>
+    <p class="embed-note">Badge auto-updates. If certification is revoked, it reverts to the standard badge.</p>
+  </div>
+</div>
+
+<footer class="footer-simple"><div class="container">
+  <p>&copy; 2026 <a href="https://rise-above.net">Rise Above Partners</a>. Built by <a href="https://www.linkedin.com/in/michaelbrowne03/" target="_blank">Michael Browne</a>. <a href="/privacy">Privacy</a> &middot; <a href="/terms">Terms</a></p>
+</div></footer>
+
+<script>
+async function apply() {
+  const repo = document.getElementById('repoInput').value.trim();
+  const email = document.getElementById('emailInput').value.trim();
+  const btn = document.getElementById('applyBtn');
+
+  if (!repo || !repo.includes('/')) {
+    showResult('Enter a valid repo: owner/repo', 'result-error');
+    return;
+  }
+  if (!email || !email.includes('@')) {
+    showResult('Enter a valid email address.', 'result-error');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Checking eligibility...';
+
+  try {
+    const res = await fetch('/.netlify/functions/certify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'apply', repo, email }),
+    });
+    const data = await res.json();
+
+    if (data.status === 'pending') {
+      showResult(`Application submitted for ${repo} (score: ${data.score}/10). An admin will review shortly. You'll receive an email at ${email}.`, 'result-success');
+    } else if (data.status === 'ineligible') {
+      const reasons = data.reasons.map(r => `- ${r}`).join('<br>');
+      showResult(`Not yet eligible (score: ${data.score}/10):<br>${reasons}`, 'result-ineligible');
+    } else if (data.status === 'already_certified') {
+      showResult(`${repo} is already Certified Safe!`, 'result-info');
+    } else if (data.status === 'already_pending') {
+      showResult(`${repo} already has a pending application.`, 'result-info');
+    } else if (data.error) {
+      showResult(data.error, 'result-error');
+    }
+  } catch {
+    showResult('Network error. Try again.', 'result-error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Check Eligibility & Apply';
+  }
+}
+
+function showResult(html, cls) {
+  const el = document.getElementById('result');
+  el.innerHTML = html;
+  el.className = cls;
+  el.style.display = 'block';
+}
+</script>
+
+</body>
+</html>
