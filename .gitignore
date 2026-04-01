@@ -12,6 +12,13 @@ node_modules
 credentials.json
 service-account.json
 
+# Internal docs (strategy, planning, competitive intel)
+CLAUDE.md
+docs/
+launch-posts.md
+CONTENT-GAP-ANALYSIS.md
+GEO-CONTENT-ANALYSIS.md
+
 # Large binaries
 *.mp4
 *.mov

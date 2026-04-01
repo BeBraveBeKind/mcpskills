@@ -8,7 +8,7 @@
 
 const crypto = require('crypto');
 
-const EMAIL = 'admin@mcpskills.io';
+const EMAIL = process.env.ADMIN_EMAIL || 'admin@mcpskills.io';
 
 function generateKeyString() {
   return 'msk_' + crypto.randomBytes(16).toString('hex');
@@ -21,8 +21,14 @@ function hashKey(key) {
 async function main() {
   const { getStore } = require('@netlify/blobs');
 
-  const siteID = process.env.NETLIFY_SITE_ID || 'REDACTED_SITE_ID';
+  const siteID = process.env.NETLIFY_SITE_ID;
   const token = process.env.NETLIFY_AUTH_TOKEN || process.env.NETLIFY_TOKEN;
+
+  if (!siteID) {
+    console.error('Need NETLIFY_SITE_ID env var.');
+    console.error('Run: NETLIFY_SITE_ID=<id> NETLIFY_AUTH_TOKEN=<pat> node scripts/create-admin-key.js');
+    process.exit(1);
+  }
 
   if (!token) {
     console.error('Need a Netlify personal access token.');
