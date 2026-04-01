@@ -59,6 +59,19 @@ a:hover { text-decoration: underline; }
 
 .icon-svg { display: inline-block; vertical-align: middle; flex-shrink: 0; }
 
+/* --- FOCUS & INTERACTION -------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(52,211,153,0.12);
+}
+button { font-family: var(--font); }
+button:not(:disabled) { cursor: pointer; }
+
 /* --- KEYFRAMES ------------------------------------------------ */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(6px); }
@@ -253,9 +266,10 @@ article pre code { background: none; border: none; padding: 0; }
   display: inline-block; padding: 10px 28px;
   background: var(--green); color: var(--bg);
   border-radius: 8px; font-weight: 600; font-size: 0.9rem;
-  text-decoration: none; transition: opacity 0.15s;
+  text-decoration: none; transition: transform 0.15s, box-shadow 0.15s;
 }
-.article-cta a.cta-btn:hover { opacity: 0.88; text-decoration: none; }
+.article-cta a.cta-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(52,211,153,0.25); text-decoration: none; }
+.article-cta a.cta-btn:active { transform: translateY(0); box-shadow: none; }
 
 /* --- FORMS (certify, etc.) ------------------------------------ */
 .form-card {
@@ -275,15 +289,19 @@ article pre code { background: none; border: none; padding: 0; }
   font-size: 0.9rem; font-family: var(--font);
   outline: none; transition: border-color 0.2s;
 }
-.form-row input:focus, .form-row textarea:focus { border-color: var(--green); }
+.form-row input:focus, .form-row textarea:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(52,211,153,0.12);
+}
 .form-btn {
   width: 100%; padding: 12px; border: none;
   border-radius: 8px; font-weight: 600; font-size: 0.92rem;
   cursor: pointer; font-family: var(--font);
-  transition: opacity 0.15s;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
 }
-.form-btn:hover { opacity: 0.88; }
-.form-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.form-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.form-btn:active { transform: translateY(0); box-shadow: none; }
+.form-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 .form-btn-green { background: var(--green); color: var(--bg); }
 .form-btn-gold  { background: var(--gold);  color: white; }
 
