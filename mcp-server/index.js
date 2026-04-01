@@ -78,11 +78,12 @@ function formatTier(tier) {
 }
 
 function formatDimensions(dims) {
+  if (!dims) return "  (dimensions unavailable)";
   return [
-    `  Alive:  ${dims.alive}/10 (maintained?)`,
-    `  Legit:  ${dims.legit}/10 (credible author?)`,
-    `  Solid:  ${dims.solid}/10 (secure?)`,
-    `  Usable: ${dims.usable}/10 (good docs?)`,
+    `  Alive:  ${dims.alive ?? '?'}/10 (maintained?)`,
+    `  Legit:  ${dims.legit ?? '?'}/10 (credible author?)`,
+    `  Solid:  ${dims.solid ?? '?'}/10 (secure?)`,
+    `  Usable: ${dims.usable ?? '?'}/10 (good docs?)`,
   ].join("\n");
 }
 
@@ -175,8 +176,9 @@ function formatFullResult(data) {
 
   for (const [key, val] of Object.entries(data.signals || {})) {
     const label = signalLabels[key] || key;
-    const bar = "█".repeat(Math.round(val)) + "░".repeat(10 - Math.round(val));
-    lines.push(`  ${bar} ${val}/10  ${label}`);
+    const v = typeof val === 'number' && !isNaN(val) ? val : 0;
+    const bar = "█".repeat(Math.round(v)) + "░".repeat(10 - Math.round(v));
+    lines.push(`  ${bar} ${v}/10  ${label}`);
   }
 
   lines.push(
@@ -241,14 +243,15 @@ function formatFullResult(data) {
 
 function formatSafetyResult(data) {
   if (data.mode !== "skills" || !data.skill) {
+    const score = data.composite ?? data.score ?? '?';
     return [
       `# Safety Scan: ${data.repo}`,
       "",
       "This repo was not detected as an AI skill or MCP server.",
       "Safety scanning only runs on repos identified as skills.",
       "",
-      `Mode: ${data.mode}`,
-      `Score: ${data.composite}/10 | Tier: ${formatTier(data.tier)}`,
+      `Mode: ${data.mode || 'standard'}`,
+      `Score: ${score}/10 | Tier: ${formatTier(data.tier)}`,
     ].join("\n");
   }
 
