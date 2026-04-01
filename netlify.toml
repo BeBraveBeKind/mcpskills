@@ -4,7 +4,7 @@
 
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = ["satori", "@resvg/resvg-js"]
+  external_node_modules = ["satori", "@resvg/resvg-js", "@netlify/blobs"]
   included_files = ["lib/fonts/**", "data/**"]
 
 # Clean URLs for blog and legal pages
@@ -38,6 +38,42 @@
   to = "/.netlify/functions/badge?repo=:splat"
   status = 200
 
+[[redirects]]
+  from = "/certify"
+  to = "/certify.html"
+  status = 200
+
+[[redirects]]
+  from = "/api/certify"
+  to = "/.netlify/functions/certify"
+  status = 200
+
+[[redirects]]
+  from = "/api/webhook"
+  to = "/.netlify/functions/webhook"
+  status = 200
+
+[[redirects]]
+  from = "/api/unlock"
+  to = "/.netlify/functions/unlock"
+  status = 200
+
 # Environment variables (set in Netlify UI, not here):
 # GITHUB_TOKEN — personal access token for 5,000 req/hr
-# Optional: CLAUDE_API_KEY — for README quality LLM assessment (V2)
+# ADMIN_KEY — protects batch-scan and admin endpoints
+# LEMONSQUEEZY_WEBHOOK_SECRET — webhook signature verification (Feature 2)
+# RESEND_API_KEY — email alerts (Feature 3)
+
+# Nightly crawl: discover new repos, score, refresh stale cache, store history
+[functions."nightly-crawl"]
+  schedule = "0 2 * * *"
+
+# Daily scan: re-score monitored repos, send alerts on changes
+[functions."daily-scan"]
+  schedule = "0 8 * * *"
+
+# Weekly digest: analyze all scores, generate findings report
+[functions."weekly-digest"]
+  schedule = "0 18 * * 0"
+
+# CORS: X-API-Key header is allowed in score.js and batch-scan.js Access-Control-Allow-Headers
