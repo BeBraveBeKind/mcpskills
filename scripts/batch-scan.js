@@ -4,7 +4,7 @@
  * Usage: node scripts/batch-scan.js
  */
 
-const { scoreRepo } = require('../lib/scorer');
+const { scoreAny } = require('../lib/score-any');
 const { cacheScore, loadScoreCache } = require('../lib/recommender');
 
 const token = process.env.GITHUB_TOKEN || null;
@@ -43,16 +43,16 @@ async function main() {
 
   let success = 0, fail = 0;
   for (const r of toScan) {
-    const [o, n] = r.split('/');
     process.stdout.write(`${r} ... `);
     try {
-      const result = await scoreRepo(o, n, token);
+      const result = await scoreAny(r, token);
       if (result.error) {
         console.log(`SKIP: ${result.error}`);
         fail++;
       } else {
         cacheScore(result);
-        console.log(`${result.composite} ${result.tier}`);
+        const label = result.limited ? `${result.composite} ${result.tier} (limited)` : `${result.composite} ${result.tier}`;
+        console.log(label);
         success++;
       }
     } catch (e) {

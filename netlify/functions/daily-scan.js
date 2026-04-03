@@ -11,7 +11,7 @@
  */
 
 const { connectLambda, getStore } = require('@netlify/blobs');
-const { scoreRepo } = require('../../lib/scorer');
+const { scoreAny } = require('../../lib/score-any');
 const { sendScoreDropAlert, sendCertificationUpdate } = require('../../lib/email');
 
 function monitorsStore() {
@@ -73,11 +73,8 @@ exports.handler = async (event) => {
   let alertsSent = 0;
 
   for (const repo of uniqueRepos) {
-    const [owner, repoName] = repo.split('/');
-    if (!owner || !repoName) continue;
-
     try {
-      const result = await scoreRepo(owner, repoName, token);
+      const result = await scoreAny(repo, token);
       if (result.error) {
         console.warn(`Failed to score ${repo}: ${result.error}`);
         continue;
@@ -149,9 +146,8 @@ exports.handler = async (event) => {
         if (record.status !== 'certified') continue;
 
         const repo = record.repo;
-        const [owner, repoName] = repo.split('/');
 
-        const result = await scoreRepo(owner, repoName, token);
+        const result = await scoreAny(repo, token, { skipPartial: true });
         if (result.error) continue;
 
         const signalCount = result.signals ? Object.values(result.signals).filter(v => v != null).length : 0;

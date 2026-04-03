@@ -6,7 +6,7 @@
  */
 
 const { connectLambda, getStore } = require('@netlify/blobs');
-const { scoreRepo } = require('../../lib/scorer');
+const { scoreAny } = require('../../lib/score-any');
 const { cacheScore, loadScoreCache } = require('../../lib/recommender');
 const { hashIP, checkRateLimit } = require('../../lib/auth');
 
@@ -16,9 +16,15 @@ const TIER_COLORS = {
   new: { bg: '#3b82f6', label: 'New' },
   blocked: { bg: '#dc2626', label: 'Blocked' },
   certified: { bg: '#B8860B', label: 'Certified Safe' },
+  limited: { bg: '#6b7280', label: 'Limited' },
 };
 
+function escapeXml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 function generateBadgeSVG(repo, score, tier, certified) {
+  repo = escapeXml(repo);
   const tierInfo = certified ? TIER_COLORS.certified : (TIER_COLORS[tier] || TIER_COLORS.new);
   const scoreText = score != null ? `${score}/10` : '?';
   const labelWidth = 100;
@@ -77,33 +83,38 @@ exports.handler = async (event) => {
     };
   }
 
-  const repo = event.queryStringParameters?.repo;
-  const REPO_RE = /^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/;
-  if (!repo || !REPO_RE.test(repo)) {
+  const input = event.queryStringParameters?.repo;
+  if (!input || input.trim().length === 0) {
     return {
       statusCode: 400,
       headers: { 'Content-Type': 'text/plain' },
-      body: 'Missing ?repo=owner/repo parameter',
+      body: 'Missing ?repo= parameter. Accepts owner/repo, npm:@scope/package, or registry URL.',
     };
   }
 
-  const [owner, repoName] = repo.split('/');
-
-  // Check cache first
+  // Check cache first (try both the raw input and common key forms)
   const cache = loadScoreCache();
   let score = null;
   let tier = 'new';
+  let limited = false;
+  const cacheKey = input.toLowerCase();
 
-  if (cache[repo]) {
-    score = cache[repo].composite;
-    tier = cache[repo].tier;
+  if (cache[input]) {
+    score = cache[input].composite;
+    tier = cache[input].tier;
+    limited = cache[input].limited || false;
+  } else if (cache[cacheKey]) {
+    score = cache[cacheKey].composite;
+    tier = cache[cacheKey].tier;
+    limited = cache[cacheKey].limited || false;
   } else {
     const token = process.env.GITHUB_TOKEN || null;
     try {
-      const result = await scoreRepo(owner, repoName, token);
+      const result = await scoreAny(input, token);
       if (!result.error) {
         score = result.composite;
         tier = result.tier;
+        limited = result.limited || false;
         cacheScore(result);
       }
     } catch {
@@ -115,13 +126,20 @@ exports.handler = async (event) => {
   let certified = false;
   try {
     const certStore = getStore('certifications');
-    const raw = await certStore.get(`cert:${repo}`);
-    if (raw) {
-      const record = JSON.parse(raw);
-      certified = record.status === 'certified';
+    // Try both the raw input and resolved repo as cert keys
+    const certKeys = [input, cacheKey].filter(Boolean);
+    for (const key of certKeys) {
+      const raw = await certStore.get(`cert:${key}`);
+      if (raw) {
+        const record = JSON.parse(raw);
+        if (record.status === 'certified') { certified = true; break; }
+      }
     }
   } catch {}
 
-  const svg = generateBadgeSVG(repo, score, tier, certified);
+  // Use "limited" tier styling for partial scores
+  const displayTier = limited ? 'limited' : tier;
+  const displayName = input.length > 40 ? input.slice(0, 37) + '...' : input;
+  const svg = generateBadgeSVG(displayName, score, displayTier, certified);
   return { statusCode: 200, headers, body: svg };
 };

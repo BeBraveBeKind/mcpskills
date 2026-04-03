@@ -10,8 +10,9 @@
  * Returns: { results: [...], scanned: N, failed: N }
  */
 
+const crypto = require('crypto');
 const { connectLambda, getStore } = require('@netlify/blobs');
-const { scoreRepo } = require('../../lib/scorer');
+const { scoreAny } = require('../../lib/score-any');
 const { cacheScore } = require('../../lib/recommender');
 const { validateApiKey, consumeCredit } = require('../../lib/auth');
 
@@ -57,7 +58,7 @@ async function saveToBlobHistory(repo, result) {
 exports.handler = async (event) => {
   const headers = {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': 'https://mcpskills.io',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, X-API-Key',
   };
@@ -82,7 +83,8 @@ exports.handler = async (event) => {
   let isPro = false;
   let maxBatch = 0;
 
-  if (adminKey && body.key === adminKey) {
+  if (adminKey && body.key && typeof body.key === 'string' && body.key.length === adminKey.length &&
+      crypto.timingSafeEqual(Buffer.from(body.key), Buffer.from(adminKey))) {
     isAdmin = true;
     maxBatch = 10;
   } else if (apiKey) {
@@ -111,28 +113,35 @@ exports.handler = async (event) => {
   const token = process.env.GITHUB_TOKEN || null;
   const results = [];
 
-  for (const repo of batch) {
-    const [owner, repoName] = repo.split('/');
-    if (!owner || !repoName) {
-      results.push({ repo, status: 'invalid' });
+  for (const input of batch) {
+    if (!input || typeof input !== 'string' || input.trim().length === 0) {
+      results.push({ input, status: 'invalid' });
       continue;
     }
 
     try {
-      const result = await scoreRepo(owner, repoName, token);
+      const result = await scoreAny(input, token);
       if (result.error) {
-        results.push({ repo, status: 'error', error: result.error });
+        results.push({ input, status: 'error', error: result.error });
       } else {
+        const cacheKey = result.repo || `npm:${result.package}`;
         cacheScore(result);
-        await saveToBlobCache(repo, result);
-        await saveToBlobHistory(repo, result);
-        results.push({ repo, status: 'ok', score: result.composite, tier: result.tier });
+        await saveToBlobCache(cacheKey, result);
+        await saveToBlobHistory(cacheKey, result);
+        results.push({
+          input,
+          repo: result.repo || null,
+          status: 'ok',
+          score: result.composite,
+          tier: result.tier,
+          limited: result.limited || false,
+        });
 
         // Consume credit for Pro users (not admin)
         if (isPro) await consumeCredit(apiKey);
       }
     } catch (e) {
-      results.push({ repo, status: 'error', error: e.message });
+      results.push({ input, status: 'error', error: e.message });
     }
   }
 

@@ -23,13 +23,13 @@
     "step": [
       {
         "@type": "HowToStep",
-        "name": "Find the GitHub repo URL",
-        "text": "Every AI skill and MCP server has source code hosted on GitHub. Find the repo URL — it's usually in the install instructions or marketplace listing."
+        "name": "Find the source URL or package name",
+        "text": "Find the repo URL, npm package name, or registry listing. It's usually in the install instructions or marketplace page. If a skill has no public source code, that's a red flag."
       },
       {
         "@type": "HowToStep",
         "name": "Run the trust scan",
-        "text": "Go to mcpskills.io, paste the GitHub repo URL, and click Scan. The algorithm scores the repo across 12 signals in about 10 seconds."
+        "text": "Go to mcpskills.io and paste the repo URL, npm package name, or registry URL. Click Scan. The algorithm scores it across up to 14 signals in about 10 seconds."
       },
       {
         "@type": "HowToStep",
@@ -85,7 +85,7 @@
 <article><div class="container">
 
   <h1>How to Check if an AI Skill is Safe Before Installing</h1>
-  <p class="meta">By <a href="https://www.linkedin.com/in/michaelbrowne03/">Michael Browne</a> &middot; March 8, 2026 &middot; 5 min read</p>
+  <p class="meta">By <a href="https://www.linkedin.com/in/michaelbrowne03/">Michael Browne</a> &middot; March 8, 2026 (updated April 2, 2026) &middot; 5 min read</p>
 
   <p>You found an AI skill or MCP server you want to install. Maybe it was recommended on Reddit, listed on Smithery, or came up in a Claude Code conversation. Before you give it access to your terminal, code, and environment variables — here's how to check if it's safe.</p>
 
@@ -102,9 +102,15 @@
   <div class="step">
     <div class="step-num">1</div>
     <div class="step-content">
-      <h3>Find the GitHub Repo URL</h3>
-      <p>Every legitimate AI skill has source code on GitHub (or GitLab/similar). The repo URL is usually in the install instructions or marketplace listing. If a skill has no public source code, that's a red flag — do not install it.</p>
-      <p>Copy the URL. It looks like: <code>https://github.com/owner/repo-name</code></p>
+      <h3>Find the Source URL or Package Name</h3>
+      <p>Every legitimate AI skill has source code in a public repository or package registry. The URL or package name is usually in the install instructions or marketplace listing. If a skill has no public source code, that's a red flag — do not install it.</p>
+      <p>Copy whatever identifier you have. It might be:</p>
+      <ul style="margin:8px 0;font-size:0.92rem;">
+        <li>A GitHub repo: <code>https://github.com/owner/repo-name</code> or <code>owner/repo</code></li>
+        <li>An npm package: <code>@scope/package-name</code> or <code>npm:package-name</code></li>
+        <li>A Smithery listing: <code>https://smithery.ai/server/owner/name</code></li>
+        <li>An OpenClaw skill URL</li>
+      </ul>
     </div>
   </div>
 
@@ -112,9 +118,10 @@
     <div class="step-num">2</div>
     <div class="step-content">
       <h3>Run the Trust Scan</h3>
-      <p>Go to <a href="https://mcpskills.io">mcpskills.io</a> and paste the GitHub repo URL into the scanner. Click <strong>Scan</strong>.</p>
-      <p>The algorithm pulls data from the GitHub API and <a href="https://scorecard.dev">OpenSSF Scorecard</a>, scores 12 signals, and returns results in about 10 seconds. No sign-up required.</p>
+      <p>Go to <a href="https://mcpskills.io">mcpskills.io</a> and paste whatever you have — GitHub URL, npm package name, Smithery URL, or <code>owner/repo</code>. Click <strong>Scan</strong>.</p>
+      <p>The scanner resolves your input to the source repository automatically. It pulls data from the GitHub API, npm registry, and <a href="https://scorecard.dev">OpenSSF Scorecard</a>, scores up to 14 signals, and returns results in about 10 seconds. No sign-up required.</p>
       <p>If the repo is detected as an AI skill or MCP server, the scanner automatically activates <strong>Skills Mode</strong> — increasing security weight and running 5 additional safety scans.</p>
+      <p>If no source repository can be found (e.g., an npm package with no linked GitHub repo), you'll get a <strong>Limited Score</strong> based on registry metadata only — publish history, downloads, maintainers, and license. This covers fewer signals, so the result is clearly labeled.</p>
     </div>
   </div>
 
@@ -180,9 +187,11 @@
 
   <h2>What About Skills Not on GitHub?</h2>
 
-  <p>mcpskills.io currently scores repos hosted on GitHub. If a skill's source code is hosted elsewhere (GitLab, Bitbucket, self-hosted), you can still apply the same framework manually:</p>
+  <p>mcpskills.io now accepts input from multiple registries — not just GitHub. You can paste an npm package name, a Smithery URL, or an OpenClaw skill, and the scanner will resolve it to the source repo automatically.</p>
 
-  <p>Check commit recency (last 30 days?). Check if issues get responses. Look at the author's profile and other projects. Search the code for the 5 safety patterns. Read the README for install instructions, license, and documentation quality.</p>
+  <p>If a skill has a source repo on GitHub that's linked from its npm or registry listing, you'll get the full 14-signal score. If there's no linked repo, you'll get a partial score from registry metadata (publish history, downloads, maintainers, license).</p>
+
+  <p>For skills hosted on platforms we don't yet support (GitLab, Bitbucket, self-hosted Forgejo), you can apply the same framework manually: Check commit recency (last 30 days?). Check if issues get responses. Look at the author's profile and other projects. Search the code for the 5 safety patterns.</p>
 
   <p>If the skill has no public source code at all, treat it as untrusted by default.</p>
 
@@ -192,18 +201,18 @@
 
   <p><code>claude mcp add mcpskills -- npx @mcpskillsio/server</code></p>
 
-  <p>Then ask: <em>"Is modelcontextprotocol/servers safe?"</em> — and get a trust score without switching windows.</p>
+  <p>Then ask: <em>"Is @anthropic-ai/sdk safe?"</em> or <em>"Score modelcontextprotocol/servers"</em> — and get a trust score without switching windows. Works with GitHub repos, npm packages, and registry URLs.</p>
 
   <h2>FAQ</h2>
 
   <div class="faq">
     <div class="faq-item">
       <div class="faq-q">How long does a scan take?</div>
-      <div class="faq-a">About 10 seconds. The algorithm fetches data from GitHub API and OpenSSF Scorecard in parallel.</div>
+      <div class="faq-a">About 10 seconds. The algorithm resolves your input (GitHub repo, npm package, or registry URL), then fetches data from GitHub API, npm registry, and OpenSSF Scorecard in parallel.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q">Is scanning free?</div>
-      <div class="faq-a">Yes. Free scans show the trust tier and 4 dimension scores. Full reports (all 12 signals + safety findings) are $9, or $29 for a 10-pack.</div>
+      <div class="faq-a">Yes. Free scans show the trust tier and 4 dimension scores. Free tier allows 3 scans per day from the website. Full reports (all 14 signals + safety findings) are $9, or $29 for a 10-pack.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q">Does a "Verified" tier guarantee safety?</div>
@@ -211,7 +220,7 @@
     </div>
     <div class="faq-item">
       <div class="faq-q">Can I score private repos?</div>
-      <div class="faq-a">Not currently. mcpskills.io only scores public GitHub repos using the public GitHub API.</div>
+      <div class="faq-a">Not currently. mcpskills.io scores public repos and packages across GitHub, npm, Smithery, and OpenClaw. Private repos and unpublished packages can't be scored.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q">What's the difference between Standard Mode and Skills Mode?</div>
@@ -221,7 +230,7 @@
 
   <div class="article-cta">
     <h3>Check before you install</h3>
-    <p>Paste any GitHub repo URL and get a trust score in 10 seconds.</p>
+    <p>Paste any repo, npm package, or registry URL and get a trust score in 10 seconds.</p>
     <a href="https://mcpskills.io" class="cta-btn">Scan Now &mdash; Free</a>
   </div>
 

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MCP Skills — Is Your AI Skill Safe?</title>
-  <meta name="description" content="Trust-score any AI skill or MCP server. 14 signals across 4 dimensions. Safety scanning for prompt injection, credential theft, and supply chain attacks. Know before you install.">
+  <meta name="description" content="Trust-score any AI skill, MCP server, or npm package. 14 signals across 4 dimensions. Paste a GitHub repo, npm package, or Smithery URL. Safety scanning for prompt injection, credential theft, and supply chain attacks. Know before you install.">
   <meta property="og:title" content="MCP Skills — Is Your AI Skill Safe?">
   <meta property="og:description" content="1,184 malicious AI skills were found in ClawHavoc. Score yours before you install.">
   <meta property="og:type" content="website">
@@ -24,9 +24,9 @@
     "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Web",
     "datePublished": "2026-03-08",
-    "dateModified": "2026-03-08",
+    "dateModified": "2026-04-02",
     "offers": [
-      { "@type": "Offer", "name": "Free Scan", "price": "0", "priceCurrency": "USD", "description": "Trust tier badge, dimension scores, and rationale for any GitHub repo" },
+      { "@type": "Offer", "name": "Free Scan", "price": "0", "priceCurrency": "USD", "description": "Trust tier badge, dimension scores, and rationale for any repo, npm package, or registry listing" },
       { "@type": "Offer", "name": "Full Report", "price": "9.00", "priceCurrency": "USD", "description": "All 14 signal scores, safety scan findings, and Skills Mode analysis" },
       { "@type": "Offer", "name": "10-Pack", "price": "29.00", "priceCurrency": "USD", "description": "10 full reports at $2.90 per scan" },
       { "@type": "Offer", "name": "Pro Plan", "price": "12.00", "priceCurrency": "USD", "description": "Unlimited scans, batch API, monitoring, 1000 agent calls/day" }
@@ -48,10 +48,10 @@
     "@context": "https://schema.org",
     "@type": "FAQPage",
     "mainEntity": [
-      { "@type": "Question", "name": "How does MCP Skills trust scoring work?", "acceptedAnswer": { "@type": "Answer", "text": "Every repo is evaluated across 4 dimensions — Alive (is it maintained?), Legit (who made it?), Solid (is it secure?), and Usable (can I work with it?). Each dimension combines multiple signals from the GitHub API, OpenSSF Scorecard, and our analysis engine to produce a composite score from 0 to 10." } },
+      { "@type": "Question", "name": "How does MCP Skills trust scoring work?", "acceptedAnswer": { "@type": "Answer", "text": "Every repo or package is evaluated across 4 dimensions — Alive (is it maintained?), Legit (who made it?), Solid (is it secure?), and Usable (can I work with it?). Each dimension combines multiple signals from the GitHub API, npm registry, OpenSSF Scorecard, and our analysis engine to produce a composite score from 0 to 10. Accepts GitHub repos, npm packages, Smithery URLs, and OpenClaw skills." } },
       { "@type": "Question", "name": "What is Skills Mode?", "acceptedAnswer": { "@type": "Answer", "text": "When MCP Skills detects an AI agent skill or MCP server, the algorithm shifts to Skills Mode. Security weight increases and two additional signals activate: Skill Spec Compliance and Tool Safety. The safety scanner checks for prompt injection, shell execution, credential access, network exfiltration, and obfuscated payloads — the exact attack patterns used in ClawHavoc." } },
       { "@type": "Question", "name": "What are the trust tiers?", "acceptedAnswer": { "@type": "Answer", "text": "Repos are assigned one of three trust tiers: Verified (score 7.5+ with strong dimensions — safe to build on), Established (score 4.5+ — solid but check the details), or New (below threshold — promising but unproven). A fourth tier, Blocked, applies when critical safety concerns are detected." } },
-      { "@type": "Question", "name": "Is the free scan really free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Free scans show the trust tier badge, all 4 dimension scores, and a one-line rationale. Unlimited scans, no account required. Paid reports ($9 per scan or $29 for a 10-pack) unlock the full 12-signal breakdown and detailed safety scan findings." } },
+      { "@type": "Question", "name": "Is the free scan really free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Free scans show the trust tier badge, all 4 dimension scores, and a one-line rationale. Free tier allows 3 scans per day from the website or 20 per day via the API. No account required. Paid reports ($9 per scan or $29 for a 10-pack) unlock the full 14-signal breakdown and detailed safety scan findings." } },
       { "@type": "Question", "name": "What are the limitations of trust scoring?", "acceptedAnswer": { "@type": "Answer", "text": "MCP Skills performs static analysis — source code pattern matching, GitHub metadata, and OpenSSF Scorecard data. It does not yet monitor runtime behavior, multi-step agent chain context leaks, or dynamically fetched payloads. A high score means strong static indicators, but no automated tool catches everything. Runtime observability and tool call auditing are on our roadmap." } }
     ]
   }
@@ -728,7 +728,7 @@
 <section class="hero"><div class="container">
   <h1>Is your AI skill <em>safe</em>?</h1>
   <p class="tagline">Know before you install.</p>
-  <p class="subtext">Trust-score any MCP server or AI skill across 14 signals &mdash; including safety scans for prompt injection, credential theft, and supply chain attacks.</p>
+  <p class="subtext">Trust-score any MCP server, npm package, or AI skill across 14 signals &mdash; including safety scans for prompt injection, credential theft, and supply chain attacks. Paste a GitHub repo, npm package name, or registry URL.</p>
 
   <div class="hero-gauge">
     <svg viewBox="0 0 220 220" fill="none">
@@ -787,11 +787,11 @@
 <section class="container">
   <div class="scanner">
     <div class="input-row">
-      <input type="text" id="repoInput" placeholder="owner/repo or https://github.com/owner/repo" autocomplete="off" spellcheck="false">
+      <input type="text" id="repoInput" placeholder="owner/repo, npm:@scope/package, or registry URL" autocomplete="off" spellcheck="false">
       <button class="scan-btn" id="scanBtn" onclick="runScan()">Scan</button>
     </div>
     <div class="input-hint">
-      Try: modelcontextprotocol/servers &middot; anthropics/anthropic-sdk-typescript &middot; vercel/ai
+      Try: modelcontextprotocol/servers &middot; npm:@anthropic-ai/sdk &middot; vercel/ai &middot; https://smithery.ai/server/neon
       <span class="rate-badge" id="rateLimitBadge"></span>
     </div>
 
@@ -874,7 +874,11 @@
   <div class="credibility">
     <div class="cred-item">
       <span class="cred-num">50+</span>
-      <span class="cred-label">Repos Scored</span>
+      <span class="cred-label">Repos &amp; Packages Scored</span>
+    </div>
+    <div class="cred-item">
+      <span class="cred-num">5</span>
+      <span class="cred-label">Registries</span>
     </div>
     <div class="cred-item">
       <span class="cred-num">14</span>
@@ -883,10 +887,6 @@
     <div class="cred-item">
       <span class="cred-num">4</span>
       <span class="cred-label">Dimensions</span>
-    </div>
-    <div class="cred-item">
-      <span class="cred-num">20</span>
-      <span class="cred-label">Files Scanned</span>
     </div>
   </div>
 </section>
@@ -926,7 +926,7 @@
      ============================================================ -->
 <section class="methodology" id="methodology"><div class="container">
   <h2>How trust scoring works</h2>
-  <p class="method-intro">4 dimensions. 14 signals. Data from GitHub API and OpenSSF Scorecard.</p>
+  <p class="method-intro">4 dimensions. 14 signals. Data from GitHub API, npm registry, and OpenSSF Scorecard.</p>
 
   <div class="dim-list">
     <div class="dim-item">
@@ -1052,8 +1052,8 @@
       <ul>
         <li><svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Trust tier badge</li>
         <li><svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Dimension scores</li>
-        <li><svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>One-line rationale</li>
-        <li><svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Unlimited scans</li>
+        <li><svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Cross-registry lookup</li>
+        <li><svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>3 scans/day</li>
       </ul>
     </div>
     <div class="price-card featured">
@@ -1122,12 +1122,22 @@
     <div class="mcp-tool">
       <h4>check_trust_score</h4>
       <code>"Score vercel/ai"</code>
-      <p>Trust tier, composite score, and 4 dimension breakdown for any GitHub repo.</p>
+      <p>Trust tier, composite score, and 4 dimension breakdown for any repo, npm package, or registry URL.</p>
     </div>
     <div class="mcp-tool">
       <h4>scan_safety</h4>
       <code>"Is this MCP safe?"</code>
       <p>5 safety checks for prompt injection, credential theft, shell execution, and more.</p>
+    </div>
+    <div class="mcp-tool">
+      <h4>auto_gate</h4>
+      <code>"Should I install this?"</code>
+      <p>Go/no-go decision with reasoning. Certified repos get instant approval.</p>
+    </div>
+    <div class="mcp-tool">
+      <h4>batch_check</h4>
+      <code>"Check these 5 deps"</code>
+      <p>Score up to 5 repos or packages in one call. Great for vetting a stack.</p>
     </div>
     <div class="mcp-tool">
       <h4>list_packages</h4>
@@ -1146,7 +1156,7 @@
      ============================================================ -->
 <section class="mcp-section" id="api"><div class="container">
   <h2>For Developers &amp; Agents</h2>
-  <p class="mcp-intro">Build trust verification into your toolchain. Agent-optimized API with go/no-go decisions.</p>
+  <p class="mcp-intro">Build trust verification into your toolchain. Accepts GitHub repos, npm packages, Smithery URLs, and more. Agent-optimized API with go/no-go decisions.</p>
 
   <div class="api-grid">
     <div class="api-example">
@@ -1154,7 +1164,7 @@
       <pre><code>curl -X POST https://mcpskills.io/.netlify/functions/score \
   -H "Content-Type: application/json" \
   -H "Accept: application/json" \
-  -d '{"repo":"owner/repo"}'
+  -d '{"repo":"npm:@anthropic-ai/sdk"}'
 
 {
   "safe": true,
@@ -1172,9 +1182,10 @@
   -H "X-API-Key: msk_your_key_here" \
   -d '{"repo":"owner/repo"}'
 
+// Also accepts: npm:@scope/package,
+// Smithery URLs, OpenClaw URLs.
 // Returns: Full 14-signal breakdown,
-// safety findings, recommendations,
-// and spec compliance details.</code></pre>
+// safety findings, recommendations.</code></pre>
     </div>
   </div>
 
@@ -1206,7 +1217,7 @@
         </span>
         MCP Skills
       </a>
-      <p>Trust-score any AI skill or MCP server. Built for developers who take security seriously.</p>
+      <p>Trust-score any AI skill, MCP server, or npm package. Built for developers who take security seriously.</p>
     </div>
     <div class="footer-col">
       <h4>Product</h4>
@@ -1271,9 +1282,36 @@ let currentResult = null;
 // --- Helpers ---
 function parseRepoInput(input) {
   input = input.trim().replace(/\/$/, '');
+  if (!input) return null;
+
+  // GitHub URL → extract owner/repo
   const ghMatch = input.match(/github\.com\/([^\/]+)\/([^\/\?#]+)/);
   if (ghMatch) return `${ghMatch[1]}/${ghMatch[2]}`;
-  if (/^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(input)) return input;
+
+  // owner/repo passthrough
+  if (/^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(input) && !input.startsWith('@')) return input;
+
+  // npm explicit prefix: npm:@scope/package or npm:package
+  if (input.startsWith('npm:')) return input;
+
+  // Scoped npm: @scope/package
+  if (/^@[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/.test(input)) return input;
+
+  // npm URL
+  if (input.includes('npmjs.com/package/')) return input;
+
+  // Smithery URL
+  if (input.includes('smithery.ai/server/')) return input;
+
+  // OpenClaw URL
+  if (input.match(/(?:openclaw\.com|clawhub\.io|openclaw\.ai)\//)) return input;
+
+  // mcp.run URL
+  if (input.includes('mcp.run/')) return input;
+
+  // Bare package name heuristic (lowercase, hyphens, dots)
+  if (/^[a-z][a-z0-9._-]{1,100}$/.test(input)) return input;
+
   return null;
 }
 
@@ -1320,7 +1358,7 @@ function updateApiKeyUI() {
 async function runScan() {
   const input = document.getElementById('repoInput').value;
   const repo = parseRepoInput(input);
-  if (!repo) { showError('Enter a valid repo: owner/repo or a GitHub URL'); return; }
+  if (!repo) { showError('Enter a repo (owner/repo), npm package (npm:@scope/name), or registry URL'); return; }
 
   document.getElementById('results').style.display = 'block';
   showEl(document.getElementById('loadingState'));
@@ -1395,7 +1433,7 @@ function renderFreePreview(data) {
 
   document.getElementById('tierBadge').innerHTML = TIER_ICONS[data.tier] || TIER_ICONS.new;
   document.getElementById('tierBadge').className = `tier-badge tier-${data.tier}`;
-  document.getElementById('repoName').textContent = data.repo;
+  document.getElementById('repoName').textContent = data.repo || data.package || 'Unknown';
   document.getElementById('repoDesc').textContent = data.meta?.description || data.tierReason || '';
 
   const label = document.getElementById('tierLabel');
@@ -1431,6 +1469,16 @@ function renderFreePreview(data) {
     html += `<div style="margin-top:8px;font-size:0.78rem;color:var(--blue);display:flex;align-items:center;gap:6px;">
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="3" stroke="var(--blue)" stroke-width="1.3"/><path d="M5.5 8L7.2 9.7L10.5 6.3" stroke="var(--blue)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Skills Mode \u2014 MCP/Agent skill detected. Enhanced safety analysis applied.
+    </div>`;
+  }
+  if (data.limited || data.mode === 'partial') {
+    html += `<div style="margin-top:10px;padding:10px 14px;background:var(--amber-bg);border:1px solid rgba(245,158,11,0.2);border-radius:8px;font-size:0.8rem;color:var(--amber);">
+      <strong>Limited Score</strong> \u2014 No source repository found. Scored using ${data.signalCount || '?'}/${data.totalPossibleSignals || 14} signals from npm registry metadata only. Safety scanning, code analysis, and supply chain checks could not be performed.
+    </div>`;
+  }
+  if (data.resolvedFrom && data.resolvedFrom.inputType !== 'github') {
+    html += `<div style="margin-top:6px;font-size:0.72rem;color:var(--text3);">
+      Resolved from ${data.resolvedFrom.inputType}: ${data.resolvedFrom.packageName || data.resolvedFrom.input}
     </div>`;
   }
   preview.innerHTML = html;

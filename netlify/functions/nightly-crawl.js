@@ -18,7 +18,7 @@
  */
 
 const { connectLambda, getStore } = require('@netlify/blobs');
-const { scoreRepo } = require('../../lib/scorer');
+const { scoreAny } = require('../../lib/score-any');
 const { discoverNewRepos } = require('../../lib/crawler');
 
 function scoreCacheStore() {
@@ -45,12 +45,13 @@ async function loadKnownRepos() {
   return known;
 }
 
-async function saveScore(repo, result) {
+async function saveScore(cacheKey, result) {
   const store = scoreCacheStore();
   const record = {
     composite: result.composite,
     tier: result.tier,
     mode: result.mode,
+    limited: result.limited || false,
     meta: {
       description: result.meta?.description || '',
       stars: result.meta?.stars || 0,
@@ -59,20 +60,22 @@ async function saveScore(repo, result) {
     },
     scannedAt: result.scannedAt,
   };
-  await store.set(repo.toLowerCase(), JSON.stringify(record));
+  await store.set(cacheKey.toLowerCase(), JSON.stringify(record));
 }
 
-async function saveHistory(repo, result) {
+async function saveHistory(cacheKey, result) {
   const store = scoreHistoryStore();
-  const date = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-  const key = `${repo.toLowerCase()}:${date}`;
+  const date = new Date().toISOString().slice(0, 10);
+  const key = `${cacheKey.toLowerCase()}:${date}`;
 
   const entry = {
-    repo,
+    repo: result.repo || null,
+    package: result.package || null,
     date,
     composite: result.composite,
     tier: result.tier,
     mode: result.mode,
+    limited: result.limited || false,
     dimensions: result.dimensions || {},
     stars: result.meta?.stars || 0,
     isSkill: result.mode === 'skills',
@@ -131,17 +134,21 @@ exports.handler = async (event) => {
 
   // --- Phase 1: DISCOVER ---
   let newRepos = [];
+  let npmOnlyPackages = [];
   try {
     const knownRepos = await loadKnownRepos();
     stats.knownBefore = knownRepos.size;
-    newRepos = await discoverNewRepos(knownRepos, token, 20);
+    const discovered = await discoverNewRepos(knownRepos, token, 20);
+    newRepos = discovered.repos;
+    npmOnlyPackages = discovered.npmOnlyPackages;
     stats.discovered = newRepos.length;
+    stats.npmDiscovered = npmOnlyPackages.length;
   } catch (err) {
     console.error('Discovery failed:', err.message);
     stats.errors++;
   }
 
-  // --- Phase 2: SCORE new discoveries (max 5 per run) ---
+  // --- Phase 2: SCORE new discoveries (max 5 repos + 3 npm packages per run) ---
   let scoreBudget = 5;
   for (const repo of newRepos) {
     if (scoreBudget <= 0 || Date.now() - startTime > BUDGET_MS) {
@@ -149,10 +156,10 @@ exports.handler = async (event) => {
       break;
     }
 
+    // Quick existence check — skip dead repos fast
     const [owner, repoName] = repo.split('/');
     if (!owner || !repoName) continue;
 
-    // Quick existence check — skip dead repos fast
     try {
       const ghHeaders = { 'User-Agent': 'mcpskills-crawler' };
       if (token) ghHeaders['Authorization'] = `Bearer ${token}`;
@@ -165,7 +172,7 @@ exports.handler = async (event) => {
     } catch {}
 
     try {
-      const result = await scoreRepo(owner, repoName, token);
+      const result = await scoreAny(repo, token);
       if (result.error) {
         console.warn(`Failed to score ${repo}: ${result.error}`);
         stats.errors++;
@@ -188,30 +195,56 @@ exports.handler = async (event) => {
     }
   }
 
+  // Score npm-only packages (partial scores, max 3 per run)
+  let npmBudget = 3;
+  stats.npmScored = 0;
+  for (const pkg of npmOnlyPackages) {
+    if (npmBudget <= 0 || Date.now() - startTime > BUDGET_MS) break;
+
+    try {
+      const result = await scoreAny(`npm:${pkg}`, token, { skipPartial: false });
+      if (result.error) {
+        stats.errorDetails.push({ input: `npm:${pkg}`, error: result.error });
+        continue;
+      }
+
+      const cacheKey = `npm:${pkg}`;
+      await Promise.all([
+        saveScore(cacheKey, result),
+        saveHistory(cacheKey, result),
+      ]);
+
+      stats.npmScored++;
+      npmBudget--;
+      console.log(`Scored (partial): npm:${pkg} → ${result.composite} (${result.tier})`);
+    } catch (err) {
+      console.error(`Error scoring npm:${pkg}:`, err.message);
+    }
+  }
+
   // --- Phase 3: REFRESH stale cache entries ---
   if (Date.now() - startTime < BUDGET_MS - 2000) {
     try {
       const staleRepos = await getStaleRepos(3);
 
-      for (const repo of staleRepos) {
+      for (const cacheKey of staleRepos) {
         if (Date.now() - startTime > BUDGET_MS) break;
 
-        const [owner, repoName] = repo.split('/');
-        if (!owner || !repoName) continue;
-
         try {
-          const result = await scoreRepo(owner, repoName, token);
+          // cacheKey may be "owner/repo" or "npm:packagename"
+          const input = cacheKey.startsWith('npm:') ? cacheKey : cacheKey;
+          const result = await scoreAny(input, token);
           if (result.error) continue;
 
           await Promise.all([
-            saveScore(repo, result),
-            saveHistory(repo, result),
+            saveScore(cacheKey, result),
+            saveHistory(cacheKey, result),
           ]);
 
           stats.refreshed++;
-          console.log(`Refreshed: ${repo} → ${result.composite}`);
+          console.log(`Refreshed: ${cacheKey} → ${result.composite}`);
         } catch (err) {
-          console.error(`Error refreshing ${repo}:`, err.message);
+          console.error(`Error refreshing ${cacheKey}:`, err.message);
         }
       }
     } catch (err) {

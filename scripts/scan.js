@@ -11,7 +11,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { scoreRepo } = require('../lib/scorer');
+const { scoreAny } = require('../lib/score-any');
 
 const PACKAGES_PATH = path.join(__dirname, '..', 'data', 'packages.json');
 const OUTPUT_PATH = path.join(__dirname, '..', 'data', 'packages-scored.json');
@@ -47,11 +47,12 @@ async function main() {
     const scoredRepos = [];
 
     for (const repoEntry of pkg.repos) {
-      const { owner, repo, role } = repoEntry;
-      process.stdout.write(`   Scoring ${owner}/${repo}...`);
+      const { owner, repo, npm: npmPkg, role } = repoEntry;
+      const input = npmPkg ? `npm:${npmPkg}` : `${owner}/${repo}`;
+      process.stdout.write(`   Scoring ${input}...`);
 
       try {
-        const result = await scoreRepo(owner, repo, token);
+        const result = await scoreAny(input, token);
 
         if (result.error) {
           console.log(` ❌ ${result.error}`);

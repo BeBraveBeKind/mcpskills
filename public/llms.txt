@@ -4,11 +4,11 @@
 
 ## What This Is
 
-MCP Skills is the trust layer for the AI skill ecosystem. It scores GitHub repos across 14 signals grouped into 4 dimensions (Alive, Legit, Solid, Usable), assigns trust tiers (Verified, Established, New, Blocked), and runs 5 safety scans against real attack patterns from ClawHavoc and ToxicSkills research. It works as a website, API, and MCP server.
+MCP Skills is the trust layer for the AI skill ecosystem. It scores AI skills, MCP servers, and packages across 14 signals grouped into 4 dimensions (Alive, Legit, Solid, Usable), assigns trust tiers (Verified, Established, New, Blocked), and runs 5 safety scans against real attack patterns from ClawHavoc and ToxicSkills research. Accepts GitHub repos, npm packages, Smithery servers, and OpenClaw skills. Available as a website, API, and MCP server.
 
 ## Docs
 
-- [Trust Scanner](https://mcpskills.io): Paste any GitHub repo URL and get a trust score. Free tier shows trust tier + dimension scores. Paid reports unlock all 14 signals and safety findings.
+- [Trust Scanner](https://mcpskills.io): Paste any repo URL, npm package name, or registry URL and get a trust score. Free tier shows trust tier + dimension scores. Paid reports unlock all 14 signals and safety findings.
 - [How Trust Scoring Works](https://mcpskills.io/#methodology): 4 dimensions, 14 signals, Skills Mode for MCP servers/AI skills with enhanced security weight and safety scanning.
 - [What We Check and What We Don't](https://mcpskills.io/#methodology): Transparent scope — static analysis of source code, GitHub metadata, and OpenSSF Scorecard. Does not cover runtime behavior, multi-step agent chain leaks, or dynamic payloads. Runtime monitoring is on the roadmap.
 - [Roadmap](https://mcpskills.io/roadmap): Public roadmap with 4 phases — what's live, what's building, what's planned, what's in research.
@@ -22,14 +22,15 @@ MCP Skills is the trust layer for the AI skill ecosystem. It scores GitHub repos
 
 - [State of AI Skill Security — March 2026](https://mcpskills.io/blog/state-of-ai-skill-security): Original research scoring 10 popular AI tools. Findings: stars don't predict trust, usability is the universal weak spot, org-backed repos score higher on credibility.
 - [ClawHavoc and the Missing Trust Layer](https://mcpskills.io/blog/clawhavoc-missing-trust-layer): Analysis of the ClawHavoc attack (1,184 malicious AI skills, 7,700 downloads before detection) and why the ecosystem needs multi-dimensional trust scoring.
-- [How to Check if an AI Skill is Safe Before Installing](https://mcpskills.io/blog/how-to-check-ai-skill-safe): Step-by-step guide — find the repo, run the scan, check the tier, review safety findings, red flags to watch for.
+- [How to Check if an AI Skill is Safe Before Installing](https://mcpskills.io/blog/how-to-check-ai-skill-safe): Step-by-step guide — find the repo or package, run the scan, check the tier, review safety findings, red flags to watch for.
+- [Score Any MCP Server — Even Without a GitHub Repo](https://mcpskills.io/blog/score-without-github-repo): How cross-registry input works. Paste npm packages, Smithery URLs, OpenClaw skills. Automatic source resolution. Limited scores for packages without repos.
 
 ## MCP Server
 
 Install: `claude mcp add mcpskills -- npx @mcpskillsio/server`
 
 8 tools available:
-- `check_trust_score` — Score any GitHub repo (trust tier, composite, 4 dimensions)
+- `check_trust_score` — Score any AI skill, MCP server, or package (accepts owner/repo, npm:@scope/package, Smithery URL, OpenClaw URL)
 - `scan_safety` — Safety-only scan for AI skills (5 attack pattern checks)
 - `list_packages` — Browse curated, pre-scored skill packages by use case
 - `get_badge` — Get SVG trust badge URL for READMEs
@@ -42,7 +43,7 @@ npm: [@mcpskillsio/server](https://www.npmjs.com/package/@mcpskillsio/server)
 
 ## API
 
-POST `https://mcpskills.io/.netlify/functions/score` with `{"repo": "owner/repo"}`.
+POST `https://mcpskills.io/.netlify/functions/score` with `{"repo": "owner/repo"}` or `{"repo": "npm:@scope/package"}` or `{"repo": "https://smithery.ai/server/name"}`.
 
 Agent response (free, with `Accept: application/json`):
 ```json
@@ -74,7 +75,8 @@ Checks 20 source files for: prompt injection, shell execution, credential access
 
 - Built by Michael Browne at Rise Above Partners LLC
 - Viroqua, Wisconsin
-- 50+ repos scored and growing (nightly crawl adds new repos daily)
+- 50+ repos and packages scored and growing (nightly crawl discovers from GitHub, npm, and Smithery daily)
+- Cross-registry: GitHub, npm, Smithery, OpenClaw, mcp.run
 - Data sources: GitHub API, OpenSSF Scorecard
 - Safety patterns from ClawHavoc and ToxicSkills research
 - All API calls audited with privacy-safe IP hashing

@@ -24,6 +24,11 @@
   status = 200
 
 [[redirects]]
+  from = "/blog/score-without-github-repo"
+  to = "/blog/score-without-github-repo.html"
+  status = 200
+
+[[redirects]]
   from = "/privacy"
   to = "/privacy.html"
   status = 200

@@ -115,6 +115,55 @@ function formatRecommendations(recs) {
 
 // --- Agent Response Formatting ---
 
+function formatPartialResult(data) {
+  const lines = [
+    `# Limited Trust Score: ${data.package || 'Unknown Package'}`,
+    "",
+    `⚠️ **Limited Score — No Source Repo Found**`,
+    `Score based on npm registry metadata only (${data.signalCount}/${data.totalPossibleSignals} signals).`,
+    "",
+    `**Score:** ${data.composite}/10`,
+    `**Tier:** ${formatTier(data.tier)}`,
+    "",
+    "## Dimensions (limited)",
+    formatDimensions(data.dimensions),
+    "",
+    "## Signals (npm metadata only)",
+  ];
+
+  const signalLabels = {
+    publish_recency: "Publish Recency",
+    publish_cadence: "Publish Cadence",
+    download_adoption: "Download Adoption",
+    maintainer_count: "Maintainer Count",
+    package_age: "Package Age",
+    dependency_count: "Dependency Count",
+    license_clarity: "License Clarity",
+  };
+
+  for (const [key, val] of Object.entries(data.signals || {})) {
+    const label = signalLabels[key] || key;
+    const v = typeof val === 'number' && !isNaN(val) ? val : 0;
+    const bar = "█".repeat(Math.round(v)) + "░".repeat(10 - Math.round(v));
+    lines.push(`  ${bar} ${v}/10  ${label}`);
+  }
+
+  lines.push(
+    "",
+    `⚠️ ${data.limitedReason}`,
+    "",
+    `📦 ${data.meta?.versions || '?'} versions | 👥 ${data.meta?.maintainerCount || '?'} maintainers | 📄 ${data.meta?.license || 'Unknown'}`,
+    `📥 ${(data.meta?.npmDownloads || 0).toLocaleString()} downloads/month`,
+  );
+
+  if (data.meta?.homepage) {
+    lines.push(`🔗 ${data.meta.homepage}`);
+  }
+
+  lines.push("", `Scanned at: ${data.scannedAt}`, "Powered by mcpskills.io");
+  return lines.join("\n");
+}
+
 function formatAgentResponse(data) {
   // Compact agent response (from free tier API)
   const rec = data.recommendation || (data.safe ? 'install' : 'caution');
@@ -308,7 +357,7 @@ function formatSafetyResult(data) {
 const server = new Server(
   {
     name: "mcpskills",
-    version: "2.1.0",
+    version: "2.2.0",
   },
   {
     capabilities: {
@@ -324,14 +373,14 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "check_trust_score",
         description:
-          "Score any GitHub repo for trustworthiness. Returns a trust score (0-10) across 4 dimensions: Alive (maintained?), Legit (credible author?), Solid (secure?), Usable (good docs?). AI skills and MCP servers get enhanced scanning with 5 safety checks. Set MCPSKILLS_API_KEY env var for full 14-signal reports.",
+          "Score any AI skill, MCP server, or GitHub repo for trustworthiness. Returns a trust score (0-10) across 4 dimensions: Alive, Legit, Solid, Usable. Accepts: owner/repo, GitHub URL, npm package (npm:@scope/name or @scope/name), Smithery URL, or OpenClaw URL. AI skills get enhanced safety scanning. Set MCPSKILLS_API_KEY for full reports.",
         inputSchema: {
           type: "object",
           properties: {
             repo: {
               type: "string",
               description:
-                'GitHub repo in "owner/repo" format (e.g., "anthropics/anthropic-sdk-typescript")',
+                'Any of: "owner/repo", GitHub URL, "npm:@scope/package", "@scope/package", Smithery URL, or OpenClaw URL',
             },
           },
           required: ["repo"],
@@ -340,14 +389,14 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "scan_safety",
         description:
-          "Run a focused safety scan on an AI skill or MCP server repo. Checks for prompt injection, shell execution, network exfiltration, credential theft, and obfuscated payloads. Returns detailed findings with file locations. Only works on repos detected as AI skills.",
+          "Run a focused safety scan on an AI skill or MCP server. Checks for prompt injection, shell execution, network exfiltration, credential theft, and obfuscated payloads. Accepts any input format (owner/repo, npm package, Smithery URL, etc.).",
         inputSchema: {
           type: "object",
           properties: {
             repo: {
               type: "string",
               description:
-                'GitHub repo in "owner/repo" format (e.g., "modelcontextprotocol/servers")',
+                'Any of: "owner/repo", GitHub URL, "npm:@scope/package", Smithery URL, or OpenClaw URL',
             },
           },
           required: ["repo"],
@@ -371,13 +420,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "get_badge",
         description:
-          "Get a trust badge URL for any GitHub repo. Returns a shields.io-style SVG badge showing the trust score and tier. Embed in READMEs to show verified trust status. Badge auto-updates hourly.",
+          "Get a trust badge URL for any repo or package. Returns a shields.io-style SVG badge showing the trust score and tier. Embed in READMEs. Badge auto-updates hourly.",
         inputSchema: {
           type: "object",
           properties: {
             repo: {
               type: "string",
-              description: 'GitHub repo in "owner/repo" format',
+              description: 'Any of: "owner/repo", GitHub URL, "npm:@scope/package", or Smithery URL',
             },
           },
           required: ["repo"],
@@ -386,13 +435,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "watch_repo",
         description:
-          "Start monitoring a repo for trust score changes. You'll be alerted when a repo's score changes significantly (±0.3 points or tier change). Requires a paid API key.",
+          "Start monitoring a repo or package for trust score changes. Alerts when score changes significantly (±0.3 points or tier change). Requires a paid API key.",
         inputSchema: {
           type: "object",
           properties: {
             repo: {
               type: "string",
-              description: 'GitHub repo in "owner/repo" format',
+              description: 'Any of: "owner/repo", GitHub URL, "npm:@scope/package", or Smithery URL',
             },
             email: {
               type: "string",
@@ -420,14 +469,14 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "batch_check",
         description:
-          "Check up to 5 repos in one call. Returns a trust assessment for each repo. Requires a Pro API key (MCPSKILLS_API_KEY). Great for bulk-vetting dependencies.",
+          "Check up to 5 repos or packages in one call. Returns a trust assessment for each. Requires a Pro API key. Accepts any mix of formats (owner/repo, npm packages, registry URLs).",
         inputSchema: {
           type: "object",
           properties: {
             repos: {
               type: "array",
               items: { type: "string" },
-              description: 'Array of GitHub repos in "owner/repo" format (max 5)',
+              description: 'Array of repos/packages in any format (max 5). E.g., ["owner/repo", "npm:@scope/pkg", "https://smithery.ai/server/name"]',
             },
           },
           required: ["repos"],
@@ -436,13 +485,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "auto_gate",
         description:
-          'Should I install this? Returns a simple go/no-go decision with reasoning. The fastest way to check if a repo is safe to use. Returns { proceed: true/false, reason: "..." }.',
+          'Should I install this? Returns a simple go/no-go decision with reasoning. Accepts any format: owner/repo, npm package, Smithery URL, etc. Returns { proceed: true/false, reason: "..." }.',
         inputSchema: {
           type: "object",
           properties: {
             repo: {
               type: "string",
-              description: 'GitHub repo in "owner/repo" format',
+              description: 'Any of: "owner/repo", "npm:@scope/package", "@scope/package", Smithery URL, or OpenClaw URL',
             },
           },
           required: ["repo"],
@@ -461,12 +510,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     switch (name) {
       case "check_trust_score": {
         const repo = args.repo;
-        if (!repo || !repo.includes("/")) {
+        if (!repo || repo.trim().length === 0) {
           return {
             content: [
               {
                 type: "text",
-                text: 'Invalid repo format. Use "owner/repo" (e.g., "anthropics/anthropic-sdk-typescript").',
+                text: 'Missing input. Accepts: "owner/repo", npm package, GitHub URL, Smithery URL, or OpenClaw URL.',
               },
             ],
             isError: true,
@@ -475,9 +524,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
         const data = await fetchScore(repo, apiKey);
 
-        // Determine if we got a full response or agent compact response
+        // Determine if we got a full response, partial, or agent compact response
         let formatted;
-        if (data.signals && data.dimensions) {
+        if (data.limited || data.mode === 'partial') {
+          // Partial score — no source repo found
+          formatted = formatPartialResult(data);
+        } else if (data.signals && data.dimensions) {
           // Full paid response
           formatted = formatFullResult(data);
         } else if (data.safe !== undefined) {
@@ -485,7 +537,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           formatted = formatAgentResponse(data);
         } else {
           // Human free response — format it for the agent
-          formatted = `${formatTier(data.tier)} ${data.repo} — ${data.composite}/10\n\nSet MCPSKILLS_API_KEY for full signal breakdown.`;
+          formatted = `${formatTier(data.tier)} ${data.repo || data.package} — ${data.composite}/10\n\nSet MCPSKILLS_API_KEY for full signal breakdown.`;
         }
 
         return { content: [{ type: "text", text: formatted }] };
@@ -493,12 +545,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case "scan_safety": {
         const repo = args.repo;
-        if (!repo || !repo.includes("/")) {
+        if (!repo || repo.trim().length === 0) {
           return {
             content: [
               {
                 type: "text",
-                text: 'Invalid repo format. Use "owner/repo".',
+                text: 'Missing input. Accepts: "owner/repo", npm package, GitHub URL, Smithery URL, or OpenClaw URL.',
               },
             ],
             isError: true,
@@ -555,9 +607,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case "get_badge": {
         const repo = args.repo;
-        if (!repo || !repo.includes("/")) {
+        if (!repo || repo.trim().length === 0) {
           return {
-            content: [{ type: "text", text: 'Invalid repo format. Use "owner/repo".' }],
+            content: [{ type: "text", text: 'Missing input. Accepts: "owner/repo", npm package, or registry URL.' }],
             isError: true,
           };
         }
@@ -593,9 +645,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case "watch_repo": {
         const repo = args.repo;
         const email = args.email;
-        if (!repo || !repo.includes("/")) {
+        if (!repo || repo.trim().length === 0) {
           return {
-            content: [{ type: "text", text: 'Invalid repo format. Use "owner/repo".' }],
+            content: [{ type: "text", text: 'Missing input. Accepts: "owner/repo", npm package, or registry URL.' }],
             isError: true,
           };
         }
@@ -703,8 +755,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const results = [];
 
         for (const repo of batch) {
-          if (!repo.includes("/")) {
-            results.push(`❌ ${repo} — invalid format`);
+          if (!repo || repo.trim().length === 0) {
+            results.push(`❌ (empty) — invalid input`);
             continue;
           }
           try {
@@ -740,9 +792,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case "auto_gate": {
         const repo = args.repo;
-        if (!repo || !repo.includes("/")) {
+        if (!repo || repo.trim().length === 0) {
           return {
-            content: [{ type: "text", text: 'Invalid repo format. Use "owner/repo".' }],
+            content: [{ type: "text", text: 'Missing input. Accepts: "owner/repo", npm package, or registry URL.' }],
             isError: true,
           };
         }

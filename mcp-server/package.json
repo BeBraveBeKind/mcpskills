@@ -1,7 +1,7 @@
 {
   "name": "@mcpskillsio/server",
-  "version": "2.1.1",
-  "description": "Trust-score any AI skill or MCP server from inside Claude Code, Cursor, or any MCP client. 14 signals, safety scanning, recommendations, badges, monitoring, batch checking, and auto-gate decisions.",
+  "version": "2.2.0",
+  "description": "Trust-score any AI skill or MCP server from inside Claude Code, Cursor, or any MCP client. Accepts GitHub repos, npm packages, Smithery URLs, and OpenClaw skills. 14 signals, safety scanning, recommendations, badges, monitoring, batch checking, and auto-gate decisions.",
   "type": "module",
   "main": "index.js",
   "bin": {

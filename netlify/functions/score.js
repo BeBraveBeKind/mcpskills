@@ -1,8 +1,10 @@
 /**
  * POST /.netlify/functions/score
- * Score a single GitHub repo against the MCP Skills trust algorithm.
+ * Score any AI skill, MCP server, or GitHub repo.
  *
  * Body: { "repo": "owner/repo" }
+ *   — or any supported format:
+ *     owner/repo, GitHub URL, npm:@scope/package, Smithery URL, OpenClaw URL
  *
  * Response modes:
  *   - Human free (no key, browser): tier + composite + meta
@@ -16,7 +18,7 @@
  */
 
 const { connectLambda, getStore } = require('@netlify/blobs');
-const { scoreRepo } = require('../../lib/scorer');
+const { scoreAny } = require('../../lib/score-any');
 const { recommend } = require('../../lib/recommender');
 const {
   authenticateRequest,
@@ -74,37 +76,42 @@ exports.handler = async (event) => {
     };
   }
 
-  const repoPath = body.repo;
-  const REPO_RE = /^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/;
-  if (!repoPath || !REPO_RE.test(repoPath)) {
+  const rawInput = body.repo;
+  if (!rawInput || typeof rawInput !== 'string' || rawInput.trim().length === 0 || rawInput.length > 500) {
     return {
       statusCode: 400,
       headers,
       body: JSON.stringify({
-        error: 'Missing or invalid "repo" field. Expected format: "owner/repo"',
+        error: 'Missing "repo" field. Accepted formats: owner/repo, GitHub URL, npm:@scope/package, Smithery URL, or OpenClaw URL.',
       }),
     };
   }
 
-  const [owner, repo] = repoPath.split('/');
+  // --- Score via unified entry point ---
   const token = process.env.GITHUB_TOKEN || null;
 
   try {
-    const result = await scoreRepo(owner, repo, token);
+    const result = await scoreAny(rawInput, token);
 
     if (result.error) {
+      const status = result.inputType === 'invalid' ? 400 : 404;
       return {
-        statusCode: 404,
+        statusCode: status,
         headers,
-        body: JSON.stringify({ error: result.error }),
+        body: JSON.stringify({ error: result.error, inputType: result.inputType }),
       };
     }
 
-    // Attach recommendations
-    try {
-      result.recommendations = recommend(owner, repo, result);
-    } catch {
-      result.recommendations = null;
+    const repoPath = result.repo || `npm:${result.package}`;
+
+    // Attach recommendations (only for full scores with a resolved repo)
+    if (result.repo) {
+      try {
+        const [owner, repo] = result.repo.split('/');
+        result.recommendations = recommend(owner, repo, result);
+      } catch {
+        result.recommendations = null;
+      }
     }
 
     // --- Persist to Blob stores ---
@@ -114,6 +121,7 @@ exports.handler = async (event) => {
         composite: result.composite,
         tier: result.tier,
         mode: result.mode,
+        limited: result.limited || false,
         meta: {
           description: result.meta?.description || '',
           stars: result.meta?.stars || 0,
@@ -192,6 +200,8 @@ exports.handler = async (event) => {
       const entry = {
         ts: now.toISOString(),
         repo: repoPath,
+        inputType: result.inputType || 'github',
+        rawInput: result.inputType !== 'github' ? rawInput.slice(0, 200) : undefined,
         tier: auth.tier,
         mode: auth.mode,
         keyPrefix,
@@ -199,6 +209,7 @@ exports.handler = async (event) => {
         resultTier: result.tier,
         score: result.composite,
         certified,
+        limited: result.limited || false,
       };
 
       // Append to daily log (read-modify-write)

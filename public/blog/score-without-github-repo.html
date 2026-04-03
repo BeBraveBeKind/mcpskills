@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Score Any MCP Server — Even Without a GitHub Repo | MCP Skills</title>
+  <meta name="description" content="MCP Skills now accepts npm packages, Smithery URLs, and OpenClaw skills — not just GitHub repos. Paste any identifier and get a trust score. Here's how it works.">
+  <meta property="og:title" content="Score Any MCP Server — Even Without a GitHub Repo">
+  <meta property="og:description" content="Paste an npm package, Smithery URL, or OpenClaw skill and get a trust score. No GitHub URL required.">
+  <meta property="og:url" content="https://mcpskills.io/blog/score-without-github-repo">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://mcpskills.io/blog/score-without-github-repo">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Score Any MCP Server — Even Without a GitHub Repo",
+    "description": "MCP Skills now accepts npm packages, Smithery URLs, and OpenClaw skills — not just GitHub repos. Cross-registry trust scoring with automatic source resolution.",
+    "datePublished": "2026-04-02",
+    "dateModified": "2026-04-02",
+    "author": {
+      "@type": "Person",
+      "name": "Michael Browne",
+      "url": "https://www.linkedin.com/in/michaelbrowne03/",
+      "jobTitle": "Founder",
+      "worksFor": { "@type": "Organization", "name": "Rise Above Partners LLC" }
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "MCP Skills",
+      "url": "https://mcpskills.io"
+    },
+    "mainEntityOfPage": "https://mcpskills.io/blog/score-without-github-repo"
+  }
+  </script>
+  <style>
+    article h1 { font-size: 1.9rem; }
+    article p { font-size: 0.92rem; }
+    article h2 { font-size: 1.25rem; }
+    .format-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.88rem; }
+    .format-table th { text-align: left; padding: 8px 12px; border-bottom: 2px solid var(--border); color: var(--text2); font-weight: 600; }
+    .format-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+    .format-table code { font-size: 0.82rem; background: var(--bg); padding: 2px 6px; border-radius: 4px; }
+  </style>
+  <!-- Privacy-friendly analytics by Plausible -->
+  <script async src="https://plausible.io/js/pa-fyKVsfIkwxBngHO5yBvvt.js"></script>
+  <script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+  </script>
+</head>
+<body>
+
+<nav><div class="container nav-inner">
+  <a href="/" class="logo">
+    <span class="logo-mark">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M5 8L7.5 10.5L12 5.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    MCP Skills
+  </a>
+  <div class="nav-links">
+    <a href="/">Scanner</a>
+    <a href="/#methodology">How it works</a>
+    <a href="/blog/state-of-ai-skill-security">Research</a>
+  </div>
+</div></nav>
+
+<article><div class="container">
+
+  <h1>Score Any MCP Server — Even Without a GitHub Repo</h1>
+  <p class="meta">By <a href="https://www.linkedin.com/in/michaelbrowne03/">Michael Browne</a> &middot; April 2, 2026 &middot; 4 min read</p>
+
+  <p>Until now, scoring an AI skill on MCP Skills meant finding the GitHub repo. You needed the <code>owner/repo</code> URL. That was fine when most MCP servers lived on GitHub, but the ecosystem has fragmented. Skills are published on npm, listed on Smithery, registered on OpenClaw, and distributed through half a dozen other channels.</p>
+
+  <p>Now you can paste any of them directly into the scanner.</p>
+
+  <h2>What Changed</h2>
+
+  <p>MCP Skills now accepts these input formats — on the website, through the API, and in the MCP server tools:</p>
+
+  <table class="format-table">
+    <tr><th>Format</th><th>Example</th></tr>
+    <tr><td>GitHub repo</td><td><code>vercel/ai</code> or <code>https://github.com/vercel/ai</code></td></tr>
+    <tr><td>npm package</td><td><code>npm:@anthropic-ai/sdk</code> or <code>@anthropic-ai/sdk</code></td></tr>
+    <tr><td>npm URL</td><td><code>https://www.npmjs.com/package/zod</code></td></tr>
+    <tr><td>Smithery URL</td><td><code>https://smithery.ai/server/upstash/context7-mcp</code></td></tr>
+    <tr><td>OpenClaw skill</td><td><code>https://openclaw.com/skills/skill-name</code></td></tr>
+    <tr><td>Bare package name</td><td><code>express</code></td></tr>
+  </table>
+
+  <p>The scanner figures out what you gave it, resolves it to the source repository, and runs the full 14-signal trust analysis. If you paste <code>npm:@anthropic-ai/sdk</code>, it finds the GitHub repo (<code>anthropics/anthropic-sdk-typescript</code>), scores it, and shows you the result — same as if you'd pasted the GitHub URL directly.</p>
+
+  <h2>What Happens When There's No Source Repo</h2>
+
+  <p>Some npm packages don't link to a GitHub repository. When that happens, you still get a score — but it's a <strong>Limited Score</strong> based on registry metadata only.</p>
+
+  <p>A limited score uses 7 signals instead of 14:</p>
+
+  <ul>
+    <li><strong>Publish recency</strong> — When was the last version published?</li>
+    <li><strong>Publish cadence</strong> — How often do new versions ship?</li>
+    <li><strong>Download adoption</strong> — How many people use it?</li>
+    <li><strong>Maintainer count</strong> — Bus factor risk</li>
+    <li><strong>Package age</strong> — How long has it existed?</li>
+    <li><strong>Dependency count</strong> — Attack surface</li>
+    <li><strong>License clarity</strong> — Is it clearly licensed?</li>
+  </ul>
+
+  <p>Limited scores are clearly labeled. They cap out at the "Established" tier — a package can never reach "Verified" without source code analysis. Safety scanning, supply chain checks, and code-level signals all require the actual source.</p>
+
+  <p>This is intentional. A limited score is better than no score, but it shouldn't be treated with the same confidence as a full analysis.</p>
+
+  <h2>How the Resolver Works</h2>
+
+  <p>When you paste something that isn't an <code>owner/repo</code>, the scanner runs a resolution step:</p>
+
+  <ol>
+    <li><strong>npm packages</strong> — Fetches metadata from the npm registry. Extracts the <code>repository.url</code> field. Falls back to the <code>homepage</code> field if no repo is listed.</li>
+    <li><strong>Smithery URLs</strong> — Queries the Smithery registry API. Extracts the source repo from the server listing.</li>
+    <li><strong>OpenClaw skills</strong> — Looks up the skill listing and extracts the GitHub link. Falls back to npm resolution if no direct link is found.</li>
+    <li><strong>Bare package names</strong> — Auto-detected as npm packages and resolved through the npm registry.</li>
+  </ol>
+
+  <p>Resolution results are cached for 24 hours. Repeated lookups for the same package don't re-fetch from the registry.</p>
+
+  <h2>Why This Matters</h2>
+
+  <p>The MCP ecosystem is fragmenting across registries. Anthropic's Connector Directory, Smithery, OpenClaw, npm, mcp.run — skills are published in different places depending on who built them and when. Developers discover a skill on one platform but need to know the underlying GitHub repo to check if it's safe.</p>
+
+  <p>That friction meant some skills never got checked. Now the barrier is gone. Paste whatever you have.</p>
+
+  <h2>Works Everywhere</h2>
+
+  <p>Cross-registry input works on the website, through the REST API, and in all 8 MCP server tools. The API accepts the same formats:</p>
+
+  <pre style="background:var(--surface);padding:16px;border-radius:8px;font-size:0.85rem;overflow-x:auto;"><code>curl -X POST https://mcpskills.io/.netlify/functions/score \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{"repo":"npm:@anthropic-ai/sdk"}'</code></pre>
+
+  <p>From the MCP server inside Claude Code or Cursor:</p>
+
+  <pre style="background:var(--surface);padding:16px;border-radius:8px;font-size:0.85rem;overflow-x:auto;"><code>"Score @anthropic-ai/sdk"
+"Is https://smithery.ai/server/upstash/context7-mcp safe?"
+"Check these 5 packages: vercel/ai, @anthropic-ai/sdk, zod, hono, drizzle-orm"</code></pre>
+
+  <h2>Nightly Discovery</h2>
+
+  <p>The nightly crawl now discovers new skills from 5 sources: the MCP Registry, GitHub topic search, GitHub keyword search, npm registry search, and the Smithery registry API. New packages are scored automatically and added to the growing index.</p>
+
+  <p>npm-only packages (those with no linked GitHub repo) get partial scores and are included in the index with the "Limited" label.</p>
+
+  <div class="article-cta">
+    <h3>Try it now</h3>
+    <p>Paste an npm package, Smithery URL, or anything else. Get a trust score in seconds.</p>
+    <a href="https://mcpskills.io" class="cta-btn">Scan Now &mdash; Free</a>
+  </div>
+
+</div></article>
+
+<footer class="footer-simple"><div class="container">
+  <p>&copy; 2026 <a href="https://rise-above.net">Rise Above Partners</a>. Built by <a href="https://www.linkedin.com/in/michaelbrowne03/" target="_blank">Michael Browne</a>. <a href="/privacy">Privacy</a> &middot; <a href="/terms">Terms</a></p>
+</div></footer>
+
+</body>
+</html>

@@ -16,7 +16,7 @@
  */
 
 const { connectLambda, getStore } = require('@netlify/blobs');
-const { scoreRepo } = require('../../lib/scorer');
+const { scoreAny } = require('../../lib/score-any');
 const { cacheScore, loadScoreCache } = require('../../lib/recommender');
 const { validateApiKey } = require('../../lib/auth');
 const { sendScoreDropAlert } = require('../../lib/email');
@@ -74,16 +74,14 @@ exports.handler = async (event) => {
 
   const { action, repo, email } = body;
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const REPO_RE = /^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/;
   if (!action || !email || !EMAIL_RE.test(email)) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing action or valid email' }) };
   }
-  if (repo && !REPO_RE.test(repo)) {
-    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid repo format' }) };
+  if (repo && (typeof repo !== 'string' || repo.trim().length === 0 || repo.length > 200)) {
+    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid input. Accepts owner/repo, npm:@scope/package, or registry URL.' }) };
   }
 
-  // #9: Verify email matches API key's registered email
-  const validation = await require('../../lib/auth').validateApiKey(apiKey);
+  // #9: Verify email matches API key's registered email (reuse validation from line 60)
   if (validation.valid && validation.email && validation.email !== email) {
     return { statusCode: 403, headers, body: JSON.stringify({ error: 'Email does not match API key' }) };
   }
@@ -104,8 +102,8 @@ exports.handler = async (event) => {
 
   switch (action) {
     case 'watch': {
-      if (!repo || !repo.includes('/')) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid repo format' }) };
+      if (!repo || repo.trim().length === 0) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing repo or package. Accepts owner/repo, npm:@scope/package, or registry URL.' }) };
       }
 
       if (userData.repos.length >= watchLimit) {
@@ -133,8 +131,7 @@ exports.handler = async (event) => {
       if (currentScore === null) {
         const token = process.env.GITHUB_TOKEN || null;
         try {
-          const [owner, repoName] = repo.split('/');
-          const result = await scoreRepo(owner, repoName, token);
+          const result = await scoreAny(repo, token);
           if (!result.error) {
             currentScore = result.composite;
             currentTier = result.tier;
@@ -206,9 +203,8 @@ exports.handler = async (event) => {
       const changes = [];
 
       for (const entry of userData.repos) {
-        const [owner, repoName] = entry.repo.split('/');
         try {
-          const result = await scoreRepo(owner, repoName, token);
+          const result = await scoreAny(entry.repo, token);
           if (result.error) continue;
 
           cacheScore(result);

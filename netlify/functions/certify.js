@@ -19,7 +19,7 @@
  */
 
 const { connectLambda, getStore } = require('@netlify/blobs');
-const { scoreRepo } = require('../../lib/scorer');
+const { scoreAny } = require('../../lib/score-any');
 const { sendCertificationUpdate } = require('../../lib/email');
 
 const REQUIREMENTS = {
@@ -83,9 +83,8 @@ exports.handler = async (event) => {
   switch (action) {
     case 'apply': {
       const { repo, email } = body;
-      const REPO_RE = /^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/;
-      if (!repo || !REPO_RE.test(repo)) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid repo format. Use owner/repo.' }) };
+      if (!repo || typeof repo !== 'string' || repo.trim().length === 0) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing repo. Accepts owner/repo, npm:@scope/package, or registry URL.' }) };
       }
       const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!email || !EMAIL_RE.test(email)) {
@@ -116,10 +115,9 @@ exports.handler = async (event) => {
 
       // Score the repo
       const token = process.env.GITHUB_TOKEN || null;
-      const [owner, repoName] = repo.split('/');
       let result;
       try {
-        result = await scoreRepo(owner, repoName, token);
+        result = await scoreAny(repo, token, { skipPartial: true });
         if (result.error) {
           return { statusCode: 404, headers, body: JSON.stringify({ error: result.error }) };
         }
@@ -169,8 +167,8 @@ exports.handler = async (event) => {
 
     case 'status': {
       const { repo } = body;
-      if (!repo || !repo.includes('/')) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid repo format' }) };
+      if (!repo || typeof repo !== 'string' || repo.trim().length === 0) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing repo or package identifier' }) };
       }
 
       try {
@@ -206,9 +204,8 @@ exports.handler = async (event) => {
         return { statusCode: 403, headers, body: JSON.stringify({ error: 'Invalid admin key' }) };
       }
 
-      const REPO_RE_ADMIN = /^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/;
-      if (!repo || !REPO_RE_ADMIN.test(repo)) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid repo format' }) };
+      if (!repo || typeof repo !== 'string' || repo.trim().length === 0) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing repo or package identifier' }) };
       }
       if (!decision || !['approve', 'reject', 'revoke'].includes(decision)) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Decision must be approve, reject, or revoke' }) };

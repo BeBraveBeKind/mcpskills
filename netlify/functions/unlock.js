@@ -8,7 +8,7 @@
  */
 
 const { connectLambda, getStore } = require('@netlify/blobs');
-const { scoreRepo } = require('../../lib/scorer');
+const { scoreAny } = require('../../lib/score-any');
 const { recommend } = require('../../lib/recommender');
 
 exports.handler = async (event, context) => {
@@ -84,18 +84,17 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Single report — score the repo and return full data
+    // Single report — score the repo/package and return full data
     const repo = record.repo;
-    if (!repo || !repo.includes('/')) {
+    if (!repo || typeof repo !== 'string' || repo.trim().length === 0) {
       return {
         statusCode: 200, headers,
         body: JSON.stringify({ status: 'unlocked', type: 'single', error: 'No repo in purchase record' }),
       };
     }
 
-    const [owner, repoName] = repo.split('/');
     const token = process.env.GITHUB_TOKEN || null;
-    const result = await scoreRepo(owner, repoName, token);
+    const result = await scoreAny(repo, token);
 
     if (result.error) {
       return {
@@ -105,7 +104,8 @@ exports.handler = async (event, context) => {
     }
 
     try {
-      result.recommendations = recommend(owner, repoName, result);
+      const [owner, repoName] = (result.repo || repo).split('/');
+      if (owner && repoName) result.recommendations = recommend(owner, repoName, result);
     } catch { /* skip */ }
 
     return {
