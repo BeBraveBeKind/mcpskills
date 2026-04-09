@@ -808,6 +808,17 @@
 
       <div id="errorState" class="error-msg" style="display:none;"></div>
 
+      <!-- Lead capture form, shown when free users hit the rate limit (Phase 3) -->
+      <div id="leadCaptureForm" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin:16px 0;">
+        <div style="font-weight:600;font-size:16px;margin-bottom:8px;">You've hit your free scan limit</div>
+        <div id="leadCaptureMessage" style="color:var(--text2);font-size:14px;margin-bottom:16px;">Drop your email and we'll send you ONE full report for free — the $9 tier, on the house.</div>
+        <form id="leadCaptureFormEl" style="display:flex;gap:8px;flex-wrap:wrap;">
+          <input type="email" id="leadCaptureEmail" placeholder="you@example.com" required style="flex:1;min-width:200px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-family:inherit;">
+          <button type="submit" id="leadCaptureBtn" style="padding:10px 20px;background:var(--green);color:#000;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px;">Send free report</button>
+        </form>
+        <div id="leadCaptureStatus" style="margin-top:12px;font-size:13px;color:var(--text2);"></div>
+      </div>
+
       <div id="resultCard" class="result-card" style="display:none;">
         <div class="result-header">
           <div class="tier-badge" id="tierBadge"></div>
@@ -1364,6 +1375,7 @@ async function runScan() {
   showEl(document.getElementById('loadingState'));
   hideElInstant(document.getElementById('resultCard'));
   hideElInstant(document.getElementById('errorState'));
+  hideElInstant(document.getElementById('leadCaptureForm'));
   document.getElementById('scanBtn').disabled = true;
   document.getElementById('scanBtn').textContent = 'Scanning...';
   startScanStatusCycle();
@@ -1379,7 +1391,16 @@ async function runScan() {
     });
     const data = await res.json();
 
-    if (res.status === 429) { showError(`Rate limit reached. ${data.upgrade || 'Try again later.'}`); return; }
+    if (res.status === 429) {
+      // Phase 3: show lead-capture form when free users hit the limit, so
+      // they can drop their email and get one full report for free.
+      if (data.leadCapture) {
+        showLeadCapture(repo, data);
+        return;
+      }
+      showError(`Rate limit reached. ${data.upgrade || 'Try again later.'}`);
+      return;
+    }
     if (res.status === 401 || res.status === 403) { showError(data.error || 'Invalid or depleted API key.'); return; }
     if (!res.ok || data.error) { showError(data.error || 'Scan failed. Check the repo path and try again.'); return; }
 
@@ -1429,6 +1450,67 @@ function showError(msg) {
   el.textContent = msg;
   showEl(el);
 }
+
+// --- Phase 3: Lead Capture on Rate Limit ---
+function showLeadCapture(repo, rateData) {
+  hideElInstant(document.getElementById('loadingState'));
+  hideElInstant(document.getElementById('errorState'));
+  hideElInstant(document.getElementById('resultCard'));
+  hideElInstant(document.getElementById('fullReport'));
+  const form = document.getElementById('leadCaptureForm');
+  const msg = document.getElementById('leadCaptureMessage');
+  const status = document.getElementById('leadCaptureStatus');
+  if (rateData?.leadCapture?.gift) msg.textContent = rateData.leadCapture.gift;
+  status.textContent = '';
+  form.dataset.repo = repo;
+  showEl(form);
+  // Prefill email if one is already saved from a prior monitoring signup
+  const savedEmail = localStorage.getItem('mcpskills_watch_email');
+  const emailInput = document.getElementById('leadCaptureEmail');
+  if (savedEmail && emailInput) emailInput.value = savedEmail;
+  emailInput?.focus();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const formEl = document.getElementById('leadCaptureFormEl');
+  if (!formEl) return;
+  formEl.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = document.getElementById('leadCaptureForm');
+    const email = document.getElementById('leadCaptureEmail').value.trim();
+    const repo = form.dataset.repo;
+    const status = document.getElementById('leadCaptureStatus');
+    const btn = document.getElementById('leadCaptureBtn');
+    if (!email || !repo) return;
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    status.textContent = '';
+    try {
+      const res = await fetch('/api/limit-capture', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, repo }),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        localStorage.setItem('mcpskills_watch_email', email);
+        status.innerHTML = '✓ ' + (data.message || 'Check your inbox for the full report.');
+        status.style.color = 'var(--green)';
+        btn.textContent = 'Sent';
+      } else {
+        status.textContent = data.error || 'Something went wrong. Try again.';
+        status.style.color = 'var(--red)';
+        btn.disabled = false;
+        btn.textContent = 'Send free report';
+      }
+    } catch (err) {
+      status.textContent = 'Network error. Try again.';
+      status.style.color = 'var(--red)';
+      btn.disabled = false;
+      btn.textContent = 'Send free report';
+    }
+  });
+});
 
 // --- Free Preview ---
 function renderFreePreview(data) {

@@ -40,7 +40,66 @@
 
 [[redirects]]
   from = "/badge/*"
-  to = "/.netlify/functions/badge?repo=:splat"
+  to = "/.netlify/functions/badge/:splat"
+  status = 200
+
+# Per-repo trust score landing pages (indexable, compound over time)
+[[redirects]]
+  from = "/score/*"
+  to = "/.netlify/functions/score-page/:splat"
+  status = 200
+
+# Weekly digest content flywheel — served from weekly-digests Blob store
+# /digest → latest week, /digest/:week → specific week, RSS for feed readers
+[[redirects]]
+  from = "/digest/rss.xml"
+  to = "/.netlify/functions/digest-rss"
+  status = 200
+[[redirects]]
+  from = "/digest/*"
+  to = "/.netlify/functions/digest-page/:splat"
+  status = 200
+[[redirects]]
+  from = "/digest"
+  to = "/.netlify/functions/digest-page"
+  status = 200
+
+# Certified Safe wall — public list of all auto + manual certified repos
+[[redirects]]
+  from = "/certified"
+  to = "/.netlify/functions/certified-wall"
+  status = 200
+
+# Lead capture when free users hit the rate limit (gift one full report)
+[[redirects]]
+  from = "/api/limit-capture"
+  to = "/.netlify/functions/limit-capture"
+  status = 200
+
+# Trending trust movers — free tier shows top 10, Pro unlocks top 50
+[[redirects]]
+  from = "/api/trending"
+  to = "/.netlify/functions/trending"
+  status = 200
+[[redirects]]
+  from = "/trending"
+  to = "/.netlify/functions/trending"
+  status = 200
+
+# Dynamic sitemap — includes every scored repo so Google can index the long tail
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "/.netlify/functions/sitemap"
+  status = 200
+
+# Researcher data exports (CC BY 4.0)
+[[redirects]]
+  from = "/data/latest.json"
+  to = "/.netlify/functions/data-export"
+  status = 200
+[[redirects]]
+  from = "/data/latest.csv"
+  to = "/.netlify/functions/data-export"
   status = 200
 
 [[redirects]]
@@ -85,5 +144,12 @@
 # Weekly digest: analyze all scores, generate findings report
 [functions."weekly-digest"]
   schedule = "0 18 * * 0"
+
+# Monthly recap: Pro user retention touch + free lead nurture.
+# Runs daily 1st–5th of each month at 14:00 UTC. Chunked + cursor'd so
+# it resumes across invocations and never double-sends. Per-recipient
+# `recap-sent:{yearMonth}:{id}` markers gate duplicate sends.
+[functions."monthly-recap"]
+  schedule = "0 14 1-5 * *"
 
 # CORS: X-API-Key header is allowed in score.js and batch-scan.js Access-Control-Allow-Headers

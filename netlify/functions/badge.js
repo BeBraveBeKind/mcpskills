@@ -9,6 +9,74 @@ const { connectLambda, getStore } = require('@netlify/blobs');
 const { scoreAny } = require('../../lib/score-any');
 const { cacheScore, loadScoreCache } = require('../../lib/recommender');
 const { hashIP, checkRateLimit } = require('../../lib/auth');
+const { tryAutoCertify } = require('../../lib/auto-certify');
+
+/**
+ * Persist a score to the Netlify Blobs score-cache store.
+ * This is the same store the nightly crawler reads, so badge-triggered
+ * discoveries permanently enter the ecosystem (no more cold-start amnesia).
+ *
+ * Also writes a discovery signal so we can count how much of the cache
+ * is being fed by badge embeds vs nightly crawl.
+ */
+async function persistBadgeDiscovery(input, result) {
+  try {
+    // Write to the persistent score-cache blob (matches nightly-crawl.js format)
+    const cacheStore = getStore('score-cache');
+    const cacheKey = (result.repo || (result.package ? `npm:${result.package}` : input)).toLowerCase();
+    const record = {
+      composite: result.composite,
+      tier: result.tier,
+      mode: result.mode,
+      limited: result.limited || false,
+      meta: {
+        description: result.meta?.description || '',
+        stars: result.meta?.stars || 0,
+        forks: result.meta?.forks || 0,
+        license: result.meta?.license || 'Unknown',
+      },
+      scannedAt: result.scannedAt,
+      discoveredVia: 'badge',
+    };
+    await cacheStore.set(cacheKey, JSON.stringify(record));
+
+    // Track discovery source for analytics / flywheel metrics
+    const discoveryStore = getStore('badge-discoveries');
+    const date = new Date().toISOString().slice(0, 10);
+    await discoveryStore.set(`${date}:${cacheKey}`, JSON.stringify({
+      input,
+      cacheKey,
+      composite: result.composite,
+      tier: result.tier,
+      discoveredAt: result.scannedAt,
+    }));
+  } catch {
+    // Non-fatal — badge still renders
+  }
+}
+
+/**
+ * Look up a repo in the persistent Blob score-cache.
+ * Returns {score, tier, limited} or null if not cached.
+ */
+async function lookupBlobCache(input) {
+  try {
+    const store = getStore('score-cache');
+    const keys = [input, input.toLowerCase()];
+    for (const k of keys) {
+      const raw = await store.get(k);
+      if (raw) {
+        const record = JSON.parse(raw);
+        return {
+          score: record.composite,
+          tier: record.tier,
+          limited: record.limited || false,
+        };
+      }
+    }
+  } catch {}
+  return null;
+}
 
 const TIER_COLORS = {
   verified: { bg: '#16a34a', label: 'Verified' },
@@ -83,16 +151,28 @@ exports.handler = async (event) => {
     };
   }
 
-  const input = event.queryStringParameters?.repo;
+  // Accept input from either ?repo= query param OR the /badge/* path.
+  // The /badge/* redirect in netlify.toml can't reliably stuff multi-segment
+  // splats into a query string, so we parse the path as a fallback.
+  let input = event.queryStringParameters?.repo;
+  if (!input) {
+    const pathMatch = (event.path || '').match(/^\/(?:badge|\.netlify\/functions\/badge)\/(.+?)\/?$/);
+    if (pathMatch) {
+      try { input = decodeURIComponent(pathMatch[1]); } catch { input = pathMatch[1]; }
+    }
+  }
   if (!input || input.trim().length === 0) {
     return {
       statusCode: 400,
       headers: { 'Content-Type': 'text/plain' },
-      body: 'Missing ?repo= parameter. Accepts owner/repo, npm:@scope/package, or registry URL.',
+      body: 'Missing repo. Use /badge/owner/repo or ?repo=owner/repo. Accepts owner/repo, npm:@scope/package, or registry URL.',
     };
   }
 
-  // Check cache first (try both the raw input and common key forms)
+  // Cache hierarchy:
+  //   1. In-memory cache (data/score-cache.json, baked into deploy) — instant, stale-ok
+  //   2. Netlify Blobs score-cache — persistent, shared with nightly crawler
+  //   3. Live score via scoreAny() — cold path, persists to Blobs on success
   const cache = loadScoreCache();
   let score = null;
   let tier = 'new';
@@ -108,17 +188,31 @@ exports.handler = async (event) => {
     tier = cache[cacheKey].tier;
     limited = cache[cacheKey].limited || false;
   } else {
-    const token = process.env.GITHUB_TOKEN || null;
-    try {
-      const result = await scoreAny(input, token);
-      if (!result.error) {
-        score = result.composite;
-        tier = result.tier;
-        limited = result.limited || false;
-        cacheScore(result);
+    // Check persistent Blob store before scoring live
+    const blobHit = await lookupBlobCache(input);
+    if (blobHit) {
+      score = blobHit.score;
+      tier = blobHit.tier;
+      limited = blobHit.limited;
+    } else {
+      // Discovery path: score live, persist to Blobs for the whole ecosystem
+      const token = process.env.GITHUB_TOKEN || null;
+      try {
+        const result = await scoreAny(input, token);
+        if (!result.error) {
+          score = result.composite;
+          tier = result.tier;
+          limited = result.limited || false;
+          cacheScore(result); // in-memory (best effort)
+          await persistBadgeDiscovery(input, result); // persistent Blob store
+          // Auto-certify eligible repos on first badge embed. This completes
+          // the loop: maintainer embeds badge → gets auto-cert gold badge.
+          const certCacheKey = (result.repo || (result.package ? `npm:${result.package}` : input)).toLowerCase();
+          await tryAutoCertify(certCacheKey, result, 'badge');
+        }
+      } catch {
+        // Badge still renders with "?" score
       }
-    } catch {
-      // Badge still renders with "?" score
     }
   }
 

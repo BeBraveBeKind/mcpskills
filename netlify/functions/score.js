@@ -60,6 +60,13 @@ exports.handler = async (event) => {
     if (auth.resetAt) response.resetAt = auth.resetAt;
     if (status === 429) {
       response.upgrade = 'Get unlimited scans at https://mcpskills.io — $9 single report or $12/mo Pro';
+      // Lead-capture hint: if the user drops an email, we'll send them ONE
+      // full report for free. Non-breaking additive field — existing clients
+      // simply ignore it. Frontend in public/index.html listens for this.
+      response.leadCapture = {
+        endpoint: '/api/limit-capture',
+        gift: 'Drop your email and we\'ll send you ONE full report for free — the $9 tier, on the house.',
+      };
     }
     return { statusCode: status, headers, body: JSON.stringify(response) };
   }

@@ -18,6 +18,8 @@
 const { connectLambda, getStore } = require('@netlify/blobs');
 const { scoreAny } = require('../../lib/score-any');
 const { discoverNewRepos } = require('../../lib/crawler');
+const { tryAutoCertify } = require('../../lib/auto-certify');
+const { recordDiscovery, getSourceBias } = require('../../lib/source-stats');
 
 function scoreCacheStore() {
   return getStore('score-cache');
@@ -156,16 +158,21 @@ exports.handler = async (event) => {
   console.log('Nightly crawl started');
 
   // --- Phase 1: DISCOVER ---
+  // newRepos shape: [{ repo, source }], npmOnlyPackages shape: [{ package, source }]
   let newRepos = [];
   let npmOnlyPackages = [];
   try {
     const knownRepos = await loadKnownRepos();
     stats.knownBefore = knownRepos.size;
-    const discovered = await discoverNewRepos(knownRepos, token, 20);
+    // Phase 4: ask source-stats for the current bias ordering so higher-
+    // yielding sources get processed first within the 8s budget.
+    const bias = await getSourceBias();
+    const discovered = await discoverNewRepos(knownRepos, token, 20, bias);
     newRepos = discovered.repos;
     npmOnlyPackages = discovered.npmOnlyPackages;
     stats.discovered = newRepos.length;
     stats.npmDiscovered = npmOnlyPackages.length;
+    stats.sourceBias = bias;
   } catch (err) {
     console.error('Discovery failed:', err.message);
     stats.errors++;
@@ -176,8 +183,12 @@ exports.handler = async (event) => {
   // and we want to guarantee npm gets budget instead of being starved by slow GitHub scores.
   let npmBudget = 3;
   stats.npmScored = 0;
-  for (const pkg of npmOnlyPackages) {
+  stats.autoCertified = 0;
+  for (const pkgItem of npmOnlyPackages) {
     if (npmBudget <= 0 || Date.now() - startTime > BUDGET_MS) break;
+    // pkgItem is { package, source } — unpack both
+    const pkg = pkgItem.package || pkgItem;
+    const source = pkgItem.source || 'npm';
 
     try {
       const result = await scoreAny(`npm:${pkg}`, token, { skipPartial: false });
@@ -191,6 +202,10 @@ exports.handler = async (event) => {
         saveScore(cacheKey, result),
         saveHistory(cacheKey, result),
       ]);
+      // Phase 4: feed the source-stats feedback loop
+      await recordDiscovery(source, cacheKey, result);
+      // Partial scores never auto-certify — tryAutoCertify short-circuits on result.mode === 'partial'
+      if (await tryAutoCertify(cacheKey, result, 'nightly-crawl')) stats.autoCertified++;
 
       stats.npmScored++;
       npmBudget--;
@@ -203,11 +218,14 @@ exports.handler = async (event) => {
   // --- Phase 2b: SCORE new GitHub repos (max 3 per run to leave budget for refresh) ---
   let scoreBudget = 3;
   stats.dead = 0;
-  for (const repo of newRepos) {
+  for (const repoItem of newRepos) {
     if (scoreBudget <= 0 || Date.now() - startTime > BUDGET_MS) {
       console.log('Budget exceeded, stopping scoring');
       break;
     }
+    // repoItem is { repo, source } — unpack both
+    const repo = repoItem.repo || repoItem;
+    const source = repoItem.source || 'unknown';
 
     const [owner, repoName] = repo.split('/');
     if (!owner || !repoName) continue;
@@ -244,10 +262,16 @@ exports.handler = async (event) => {
         saveScore(repo, result),
         saveHistory(repo, result),
       ]);
+      // Phase 4: feed the source-stats feedback loop
+      await recordDiscovery(source, repo, result);
+      if (await tryAutoCertify(repo, result, 'nightly-crawl')) {
+        stats.autoCertified++;
+        console.log(`  ★ Auto-certified: ${repo}`);
+      }
 
       stats.scored++;
       scoreBudget--;
-      console.log(`Scored: ${repo} → ${result.composite} (${result.tier})`);
+      console.log(`Scored: ${repo} [${source}] → ${result.composite} (${result.tier})`);
     } catch (err) {
       console.error(`Error scoring ${repo}:`, err.message);
       stats.errors++;
@@ -268,6 +292,10 @@ exports.handler = async (event) => {
           const input = cacheKey.startsWith('npm:') ? cacheKey : cacheKey;
           const result = await scoreAny(input, token);
           if (result.error) continue;
+
+          // Auto-cert on refresh too — lets repos that cross the threshold
+          // get their gold badge without a re-discovery cycle.
+          if (await tryAutoCertify(cacheKey, result, 'nightly-crawl:refresh')) stats.autoCertified++;
 
           await Promise.all([
             saveScore(cacheKey, result),
