@@ -3,18 +3,16 @@
  * Runs at 2am UTC daily — 6 hours before daily-scan (8am).
  *
  * Three jobs in priority order (within 10s Netlify timeout):
- *   1. DISCOVER — find new repos from MCP Registry + GitHub search
- *   2. SCORE — score up to 5 new discoveries
- *   3. REFRESH — re-score up to 3 stale cached repos (oldest first)
+ *   1. DISCOVER — find new repos from MCP Registry + GitHub search (dead repos filtered out)
+ *   2. SCORE — npm first (fast, no HEAD checks), then GitHub (slower)
+ *   3. REFRESH — re-score up to 2 stale cached repos (oldest first)
  *
  * All scores stored in "score-history" Blob store for trend analysis.
  * New discoveries + refreshed scores stored in "score-cache" Blob store
- * for fast badge/scan lookups.
+ * for fast badge/scan lookups. Dead (404) repos persisted to "dead-repos"
+ * store so they're filtered out of future discoveries.
  *
  * Budget: ~8s usable (10s timeout - 2s overhead)
- *   - Discovery: ~3s (3 parallel API calls)
- *   - Scoring: ~1s per repo (GitHub API)
- *   - Target: 5 new + 3 refresh = 8 repos per night
  */
 
 const { connectLambda, getStore } = require('@netlify/blobs');
@@ -33,6 +31,10 @@ function crawlStatsStore() {
   return getStore('crawl-stats');
 }
 
+function deadReposStore() {
+  return getStore('dead-repos');
+}
+
 async function loadKnownRepos() {
   const store = scoreCacheStore();
   const known = new Set();
@@ -42,7 +44,28 @@ async function loadKnownRepos() {
       known.add(b.key.toLowerCase());
     }
   } catch {}
+
+  // Also load dead repos — treat as "known" so discovery skips them
+  try {
+    const deadStore = deadReposStore();
+    const { blobs } = await deadStore.list();
+    for (const b of blobs) {
+      known.add(b.key.toLowerCase());
+    }
+  } catch {}
+
   return known;
+}
+
+async function markDead(repo, status) {
+  try {
+    const store = deadReposStore();
+    await store.set(repo.toLowerCase(), JSON.stringify({
+      repo,
+      status,
+      markedAt: new Date().toISOString(),
+    }));
+  } catch {}
 }
 
 async function saveScore(cacheKey, result) {
@@ -148,18 +171,49 @@ exports.handler = async (event) => {
     stats.errors++;
   }
 
-  // --- Phase 2: SCORE new discoveries (max 5 repos + 3 npm packages per run) ---
-  let scoreBudget = 5;
+  // --- Phase 2a: SCORE npm-only packages FIRST (fast, no HEAD checks needed) ---
+  // npm runs before GitHub because partial scoring is cheaper (~500ms per pkg vs ~1.5s)
+  // and we want to guarantee npm gets budget instead of being starved by slow GitHub scores.
+  let npmBudget = 3;
+  stats.npmScored = 0;
+  for (const pkg of npmOnlyPackages) {
+    if (npmBudget <= 0 || Date.now() - startTime > BUDGET_MS) break;
+
+    try {
+      const result = await scoreAny(`npm:${pkg}`, token, { skipPartial: false });
+      if (result.error) {
+        stats.errorDetails.push({ input: `npm:${pkg}`, error: result.error });
+        continue;
+      }
+
+      const cacheKey = `npm:${pkg}`;
+      await Promise.all([
+        saveScore(cacheKey, result),
+        saveHistory(cacheKey, result),
+      ]);
+
+      stats.npmScored++;
+      npmBudget--;
+      console.log(`Scored (partial): npm:${pkg} → ${result.composite} (${result.tier})`);
+    } catch (err) {
+      console.error(`Error scoring npm:${pkg}:`, err.message);
+    }
+  }
+
+  // --- Phase 2b: SCORE new GitHub repos (max 3 per run to leave budget for refresh) ---
+  let scoreBudget = 3;
+  stats.dead = 0;
   for (const repo of newRepos) {
     if (scoreBudget <= 0 || Date.now() - startTime > BUDGET_MS) {
       console.log('Budget exceeded, stopping scoring');
       break;
     }
 
-    // Quick existence check — skip dead repos fast
     const [owner, repoName] = repo.split('/');
     if (!owner || !repoName) continue;
 
+    // Quick existence check — skip dead repos fast AND persist them
+    // so future crawls don't rediscover the same 404s.
     try {
       const ghHeaders = { 'User-Agent': 'mcpskills-crawler' };
       if (token) ghHeaders['Authorization'] = `Bearer ${token}`;
@@ -167,6 +221,12 @@ exports.handler = async (event) => {
       if (!check.ok) {
         stats.errorDetails.push({ repo, error: `HEAD check: ${check.status}` });
         stats.errors++;
+        // Persist dead repos (404 or 410) so they're filtered out of future discoveries.
+        // Don't persist 403 (rate limit) or 5xx (transient) — those may come back.
+        if (check.status === 404 || check.status === 410) {
+          await markDead(repo, check.status);
+          stats.dead++;
+        }
         continue;
       }
     } catch {}
@@ -192,33 +252,6 @@ exports.handler = async (event) => {
       console.error(`Error scoring ${repo}:`, err.message);
       stats.errors++;
       stats.errorDetails.push({ repo, error: err.message });
-    }
-  }
-
-  // Score npm-only packages (partial scores, max 3 per run)
-  let npmBudget = 3;
-  stats.npmScored = 0;
-  for (const pkg of npmOnlyPackages) {
-    if (npmBudget <= 0 || Date.now() - startTime > BUDGET_MS) break;
-
-    try {
-      const result = await scoreAny(`npm:${pkg}`, token, { skipPartial: false });
-      if (result.error) {
-        stats.errorDetails.push({ input: `npm:${pkg}`, error: result.error });
-        continue;
-      }
-
-      const cacheKey = `npm:${pkg}`;
-      await Promise.all([
-        saveScore(cacheKey, result),
-        saveHistory(cacheKey, result),
-      ]);
-
-      stats.npmScored++;
-      npmBudget--;
-      console.log(`Scored (partial): npm:${pkg} → ${result.composite} (${result.tier})`);
-    } catch (err) {
-      console.error(`Error scoring npm:${pkg}:`, err.message);
     }
   }
 

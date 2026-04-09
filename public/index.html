@@ -1411,7 +1411,8 @@ async function runScan() {
       }
     }
   } catch (err) {
-    showError('Network error. Please try again.');
+    console.error('Scan error:', err);
+    showError(`Scan failed: ${err.message || 'Network error'}. Please try again.`);
   } finally {
     hideEl(document.getElementById('loadingState'));
     stopScanStatusCycle();
@@ -1422,6 +1423,8 @@ async function runScan() {
 
 function showError(msg) {
   hideElInstant(document.getElementById('loadingState'));
+  hideElInstant(document.getElementById('resultCard'));
+  hideElInstant(document.getElementById('fullReport'));
   const el = document.getElementById('errorState');
   el.textContent = msg;
   showEl(el);
@@ -1536,9 +1539,12 @@ function renderFullReport(data) {
   html += '<div class="signal-grid">';
   for (const [name, score] of Object.entries(signals)) {
     const label = name.replace(/_/g, ' ');
+    const hasScore = typeof score === 'number' && !isNaN(score);
+    const displayScore = hasScore ? score.toFixed(1) : 'n/a';
+    const displayColor = hasScore ? colorForScore(score) : 'var(--text3)';
     html += `<div class="signal-item">
       <div class="signal-name">${label}</div>
-      <div class="signal-score" style="color:${colorForScore(score)}">${score.toFixed(1)}<span style="font-size:0.7rem;color:var(--text3);"> / 10</span></div>
+      <div class="signal-score" style="color:${displayColor}">${displayScore}<span style="font-size:0.7rem;color:var(--text3);"> / 10</span></div>
     </div>`;
   }
   html += '</div>';
