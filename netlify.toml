@@ -103,6 +103,11 @@
   status = 200
 
 [[redirects]]
+  from = "/methodology"
+  to = "/methodology.html"
+  status = 200
+
+[[redirects]]
   from = "/roadmap"
   to = "/roadmap.html"
   status = 200

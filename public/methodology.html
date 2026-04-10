@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trust Scoring Methodology — How MCP Skills Evaluates AI Skills | MCP Skills</title>
+  <meta name="description" content="How MCP Skills trust-scores AI skills, MCP servers, and npm packages. 14 signals across 4 dimensions, 5 safety scans, 3 trust tiers, and automated certification. Transparent methodology, reproducible results.">
+  <meta property="og:title" content="Trust Scoring Methodology — MCP Skills">
+  <meta property="og:description" content="14 signals, 4 dimensions, 5 safety scans. Here's how we evaluate every AI skill before you install it.">
+  <meta property="og:url" content="https://mcpskills.io/methodology">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://mcpskills.io/methodology">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Trust Scoring Methodology — How MCP Skills Evaluates AI Skills",
+    "description": "Methodology for scoring AI skills, MCP servers, and npm packages across 14 signals in 4 dimensions with safety scanning and automated certification.",
+    "datePublished": "2026-04-10",
+    "dateModified": "2026-04-10",
+    "author": {
+      "@type": "Person",
+      "name": "Michael Browne",
+      "url": "https://www.linkedin.com/in/michaelbrowne03/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "MCP Skills",
+      "url": "https://mcpskills.io"
+    },
+    "mainEntityOfPage": "https://mcpskills.io/methodology"
+  }
+  </script>
+  <script defer data-domain="mcpskills.io" src="https://plausible.io/js/script.js"></script>
+  <style>
+    .meth-hero { padding: 48px 0 24px; border-bottom: 1px solid var(--border); }
+    .meth-crumbs { color: var(--text3); font-size: 13px; margin-bottom: 16px; }
+    .meth-crumbs a { color: var(--text2); }
+    .meth-title { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+    .meth-sub { color: var(--text2); font-size: 16px; max-width: 640px; line-height: 1.6; }
+    .meth-section { padding: 40px 0; border-bottom: 1px solid var(--border); }
+    .meth-section h2 { font-size: 22px; font-weight: 700; margin-bottom: 16px; }
+    .meth-section h3 { font-size: 17px; font-weight: 600; margin: 24px 0 10px; }
+    .meth-section p { color: var(--text2); font-size: 15px; line-height: 1.7; margin-bottom: 12px; max-width: 680px; }
+    .meth-section ul { padding-left: 20px; margin-bottom: 16px; }
+    .meth-section li { color: var(--text2); font-size: 15px; line-height: 1.7; margin-bottom: 6px; }
+    .meth-section li strong { color: var(--text); }
+    .meth-dim { display: grid; grid-template-columns: 6px 1fr; gap: 20px; padding: 20px 0; }
+    .meth-dim-accent { border-radius: 3px; }
+    .meth-dim-name { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+    .meth-dim-q { color: var(--text3); font-size: 14px; margin-bottom: 10px; font-style: italic; }
+    .meth-signal-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .meth-signal { background: var(--surface2); padding: 6px 12px; border-radius: 6px; font-size: 13px; color: var(--text2); }
+    .meth-tier-row { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); align-items: start; }
+    .meth-tier-row:last-child { border-bottom: none; }
+    .meth-tier-name { font-weight: 700; font-size: 15px; }
+    .meth-tier-desc { color: var(--text2); font-size: 14px; line-height: 1.6; }
+    .meth-callout { background: var(--surface); border: 1px solid var(--border); padding: 24px; border-radius: 12px; margin: 24px 0; }
+    .meth-callout h3 { margin-top: 0; }
+    .meth-safety-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-top: 16px; }
+    .meth-safety-item { background: var(--surface2); padding: 14px; border-radius: 8px; }
+    .meth-safety-name { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+    .meth-safety-desc { color: var(--text3); font-size: 12px; }
+    .meth-disq { background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.2); padding: 16px; border-radius: 8px; margin-top: 16px; }
+    .meth-disq-title { color: var(--red); font-weight: 600; font-size: 14px; margin-bottom: 8px; }
+    .meth-disq li { color: var(--text2); font-size: 13px; margin-bottom: 4px; }
+    .meth-cta { background: var(--surface); border: 1px solid var(--border); padding: 32px; border-radius: 12px; text-align: center; margin: 40px 0; }
+    .meth-cta h3 { font-size: 20px; margin-bottom: 8px; }
+    .meth-cta p { color: var(--text2); font-size: 14px; margin-bottom: 16px; }
+    .meth-cta a { display: inline-block; padding: 12px 24px; background: var(--green); color: #000; border-radius: 8px; font-weight: 600; text-decoration: none; }
+    .meth-footer { text-align: center; padding: 48px 0; color: var(--text3); font-size: 13px; }
+    .meth-footer a { color: var(--text2); }
+    @media (max-width: 600px) {
+      .meth-tier-row { grid-template-columns: 1fr; gap: 4px; }
+      .meth-safety-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" style="max-width:780px;">
+
+    <section class="meth-hero">
+      <nav class="meth-crumbs"><a href="/">MCP Skills</a> / Methodology</nav>
+      <h1 class="meth-title">Trust Scoring Methodology</h1>
+      <p class="meth-sub">How we evaluate AI skills, MCP servers, and npm packages. Every score is computed from public data — no manual curation, no pay-to-play, no gaming the algorithm.</p>
+    </section>
+
+    <!-- PHILOSOPHY -->
+    <section class="meth-section">
+      <h2>Philosophy</h2>
+      <p>Stars don't mean safe. Downloads don't mean maintained. Brand recognition doesn't mean the code is audited. We built MCP Skills because the trust signals that developers actually need are scattered across half a dozen platforms and none of them talk to each other.</p>
+      <p>Our scoring engine pulls signals from multiple public data sources, combines them into a single composite score, and assigns a trust tier. Every repo gets the same treatment — we don't inflate scores for popular tools or penalize newcomers arbitrarily.</p>
+      <p>We deliberately <strong>do not publish the exact weights or formulas</strong> behind each signal. Transparent methodology doesn't require giving adversaries a blueprint for gaming it. What we do publish: every signal name, every dimension, every tier threshold, every disqualifier, and every safety scan pattern. You can see exactly <em>what</em> we evaluate and <em>why</em> — just not the precise math.</p>
+    </section>
+
+    <!-- DATA SOURCES -->
+    <section class="meth-section">
+      <h2>Data sources</h2>
+      <p>Scores are computed from publicly available data. We never access private repositories, paid APIs, or non-public metadata.</p>
+      <ul>
+        <li><strong>GitHub REST API</strong> — commit history, release tags, issue tracker, contributor list, CI/CD workflows, file contents (README, LICENSE, package.json, SKILL.md)</li>
+        <li><strong>npm registry</strong> — download counts, publish history, maintainer count, dependency list, package age</li>
+        <li><strong>OpenSSF Scorecard signals</strong> — security posture indicators derived from repository metadata</li>
+        <li><strong>Source code analysis</strong> — pattern matching against known attack signatures in up to 20 source files per repository</li>
+      </ul>
+    </section>
+
+    <!-- TWO MODES -->
+    <section class="meth-section">
+      <h2>Two scoring modes</h2>
+
+      <h3>Standard Mode (12 signals)</h3>
+      <p>Applied to general-purpose repositories — libraries, frameworks, utilities. Evaluates maintenance activity, author credibility, security hygiene, and documentation quality.</p>
+
+      <h3>Skills Mode (14 signals)</h3>
+      <p>Auto-detected when the repository contains indicators of an AI skill, MCP server, or agent tool. Skills Mode adds two signals focused on tool-specific safety and spec compliance, and shifts the scoring weight toward the Solid dimension because AI tools get access to sensitive resources — your terminal, environment variables, and network.</p>
+      <p>Detection is confidence-based: the engine looks for multiple independent indicators (manifest files, naming patterns, metadata keywords) and only activates Skills Mode when the confidence threshold is met. No single indicator triggers it alone.</p>
+    </section>
+
+    <!-- 4 DIMENSIONS -->
+    <section class="meth-section">
+      <h2>4 Dimensions</h2>
+      <p>Every signal maps to one of four dimensions. Each dimension answers a specific question a developer should ask before installing anything.</p>
+
+      <div class="meth-dim">
+        <div class="meth-dim-accent" style="background:var(--green);"></div>
+        <div>
+          <div class="meth-dim-name" style="color:var(--green);">Alive</div>
+          <div class="meth-dim-q">Is anyone home?</div>
+          <p style="max-width:100%;">Measures whether the project is actively maintained. A repo that hasn't been touched in 6 months, never cuts releases, or ignores open issues is a liability even if the code was good once.</p>
+          <div class="meth-signal-grid">
+            <span class="meth-signal">Commit recency</span>
+            <span class="meth-signal">Release cadence</span>
+            <span class="meth-signal">Issue responsiveness</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="meth-dim">
+        <div class="meth-dim-accent" style="background:var(--blue);"></div>
+        <div>
+          <div class="meth-dim-name" style="color:var(--blue);">Legit</div>
+          <div class="meth-dim-q">Can I trust who made this?</div>
+          <p style="max-width:100%;">Evaluates the people behind the project. A single anonymous author with zero community adoption is higher-risk than an org-backed project with diverse contributors and real download volume.</p>
+          <div class="meth-signal-grid">
+            <span class="meth-signal">Author credibility</span>
+            <span class="meth-signal">Community adoption</span>
+            <span class="meth-signal">Contributor diversity</span>
+            <span class="meth-signal">Download adoption</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="meth-dim">
+        <div class="meth-dim-accent" style="background:var(--amber);"></div>
+        <div>
+          <div class="meth-dim-name" style="color:var(--amber);">Solid</div>
+          <div class="meth-dim-q">Is it secure?</div>
+          <p style="max-width:100%;">The heaviest dimension in Skills Mode. Checks security hygiene, dependency risk, CI/CD supply chain integrity, and — for AI skills — runs 5 pattern-based safety scans against actual source code.</p>
+          <div class="meth-signal-grid">
+            <span class="meth-signal">Security posture</span>
+            <span class="meth-signal">Dependency health</span>
+            <span class="meth-signal">Tool safety *</span>
+            <span class="meth-signal">Supply chain safety *</span>
+          </div>
+          <p style="font-size:12px;color:var(--text3);margin-top:8px;">* Skills Mode only</p>
+        </div>
+      </div>
+
+      <div class="meth-dim">
+        <div class="meth-dim-accent" style="background:var(--purple);"></div>
+        <div>
+          <div class="meth-dim-name" style="color:var(--purple);">Usable</div>
+          <div class="meth-dim-q">Can I actually work with this?</div>
+          <p style="max-width:100%;">Scores the developer experience. A brilliantly-engineered library with no README, no license, and no spec compliance is still unusable in practice.</p>
+          <div class="meth-signal-grid">
+            <span class="meth-signal">README quality</span>
+            <span class="meth-signal">Spec compliance *</span>
+            <span class="meth-signal">License clarity</span>
+          </div>
+          <p style="font-size:12px;color:var(--text3);margin-top:8px;">* Skills Mode only — checks for SKILL.md, server manifest, OpenClaw frontmatter</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SAFETY SCANNING -->
+    <section class="meth-section">
+      <h2>Safety scanning</h2>
+      <p>When Skills Mode activates, the engine reads up to 20 source files from the repository and scans for 5 threat patterns derived from real-world attacks — including <a href="https://blog.trailofbits.com/2025/01/09/clawhavoc-mcp-supply-chain-attack/">ClawHavoc</a> (1,184 malicious skills on a major marketplace) and the <a href="https://arxiv.org/abs/2504.03767">ToxicSkills</a> academic research.</p>
+
+      <div class="meth-safety-grid">
+        <div class="meth-safety-item">
+          <div class="meth-safety-name">Prompt injection</div>
+          <div class="meth-safety-desc">Hidden instructions that override the user's intent or manipulate tool-calling behavior</div>
+        </div>
+        <div class="meth-safety-item">
+          <div class="meth-safety-name">Shell execution</div>
+          <div class="meth-safety-desc">Unguarded exec/spawn calls that could run arbitrary commands on the host</div>
+        </div>
+        <div class="meth-safety-item">
+          <div class="meth-safety-name">Credential access</div>
+          <div class="meth-safety-desc">Patterns that read API keys, tokens, or secrets from the environment</div>
+        </div>
+        <div class="meth-safety-item">
+          <div class="meth-safety-name">Network exfiltration</div>
+          <div class="meth-safety-desc">Outbound requests that could leak sensitive data to external servers</div>
+        </div>
+        <div class="meth-safety-item">
+          <div class="meth-safety-name">Obfuscated payloads</div>
+          <div class="meth-safety-desc">Base64-encoded strings, eval() calls, or minified code blocks that hide intent</div>
+        </div>
+      </div>
+
+      <p style="margin-top:16px;">Safety scanning is static analysis — it checks source code patterns, not runtime behavior. A clean scan does not guarantee runtime safety in all contexts. We're transparent about this limitation in our <a href="/blog/how-to-check-ai-skill-safe">safety guide</a>.</p>
+    </section>
+
+    <!-- TRUST TIERS -->
+    <section class="meth-section">
+      <h2>Trust tiers</h2>
+      <p>Every scored repo receives one of four trust tiers based on its composite score, dimension strength, signal coverage, and the presence of disqualifiers.</p>
+
+      <div style="margin-top:20px;">
+        <div class="meth-tier-row">
+          <div class="meth-tier-name" style="color:var(--green);">Verified</div>
+          <div class="meth-tier-desc">Strong scores across all dimensions. Sufficient signal coverage. No disqualifiers. Safe to build on with confidence.</div>
+        </div>
+        <div class="meth-tier-row">
+          <div class="meth-tier-name" style="color:var(--amber);">Established</div>
+          <div class="meth-tier-desc">Solid overall but may have weaker areas. Check the dimension breakdown before depending on it.</div>
+        </div>
+        <div class="meth-tier-row">
+          <div class="meth-tier-name" style="color:var(--blue);">New</div>
+          <div class="meth-tier-desc">Below threshold. Could be a new project with limited history, or a repo with real weaknesses. Proceed with awareness.</div>
+        </div>
+        <div class="meth-tier-row">
+          <div class="meth-tier-name" style="color:var(--red);">Blocked</div>
+          <div class="meth-tier-desc">One or more disqualifying conditions detected. We strongly recommend against installing repos in this tier until the underlying issue is resolved.</div>
+        </div>
+      </div>
+
+      <div class="meth-disq">
+        <div class="meth-disq-title">Disqualifying conditions</div>
+        <ul>
+          <li><strong>Archived</strong> — the repository is marked as archived by its owner</li>
+          <li><strong>Critical CVE</strong> — known critical vulnerability in the dependency tree</li>
+          <li><strong>No license</strong> — no license file detected (legal risk for adopters)</li>
+          <li><strong>Dangerous workflow</strong> — CI/CD workflow with known exploitable patterns</li>
+          <li><strong>Safety block</strong> — tool safety score critically low (Skills Mode only)</li>
+          <li><strong>Supply chain risk</strong> — token exfiltration or PR target checkout in CI pipelines</li>
+          <li><strong>Single author + low adoption</strong> — one contributor with minimal community validation</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- CERTIFICATION -->
+    <section class="meth-section">
+      <h2>Certified Safe program</h2>
+      <p>Repos that meet all certification requirements — strong composite score, solid security dimension, sufficient signal coverage, and no disqualifiers — are automatically awarded Certified Safe status. Certification is algorithmic, not pay-to-play.</p>
+      <p>Certified repos receive a gold badge that can be embedded in READMEs. Certification is <strong>re-evaluated nightly</strong> and automatically revoked if the repo drops below requirements. There is no permanent certification — trust is earned continuously.</p>
+      <p>View the current certified repos at <a href="/certified">/certified</a>.</p>
+    </section>
+
+    <!-- PARTIAL SCORING -->
+    <section class="meth-section">
+      <h2>Partial scoring</h2>
+      <p>Some packages don't have a public GitHub repository — they exist only on npm or another registry. For these, MCP Skills generates a partial score using 7 signals from registry metadata: publish recency, publish cadence, download volume, maintainer count, package age, dependency count, and license clarity.</p>
+      <p>Partial scores are clearly labeled and capped at Established tier. They can never reach Verified because without source code access, safety scanning and supply chain analysis can't run. If you're evaluating a package with a partial score, finding the source repository is the single most valuable step you can take.</p>
+    </section>
+
+    <!-- WHAT WE DON'T DO -->
+    <section class="meth-section">
+      <h2>What we don't do (yet)</h2>
+      <p>Transparency means being honest about limitations. Here's what MCP Skills does <strong>not</strong> currently evaluate:</p>
+      <ul>
+        <li><strong>Runtime behavior</strong> — we analyze source code patterns, not live execution. A tool that behaves differently at runtime (e.g., fetching payloads dynamically) would not be caught by static analysis.</li>
+        <li><strong>Multi-step agent chains</strong> — context leaks across chained tool calls are a known risk that static analysis can't fully model.</li>
+        <li><strong>Closed-source or obfuscated packages</strong> — if the code isn't accessible, we can't scan it. Partial scores make this clear.</li>
+        <li><strong>Sandboxed execution testing</strong> — we don't run tools in a sandbox to observe actual behavior. This is on the roadmap.</li>
+      </ul>
+      <p>See our <a href="/roadmap">roadmap</a> for planned improvements.</p>
+    </section>
+
+    <!-- REPRODUCIBILITY -->
+    <section class="meth-section">
+      <h2>Reproducibility</h2>
+      <p>Scores are deterministic given the same repository state at the same point in time. Two scans of the same repo within the same hour will produce identical results (barring concurrent commits or releases).</p>
+      <p>Scores change over time as repositories evolve — commits land, issues get responded to, dependencies update, new releases ship. Our nightly crawler re-scores repos to keep the data fresh. Historical scores are stored and available through the <a href="/digest">weekly digest</a> and <a href="/trending">trending page</a>.</p>
+      <p>The full dataset is available under CC BY 4.0 at <a href="/data/latest.json">/data/latest.json</a>.</p>
+    </section>
+
+    <!-- CTA -->
+    <div class="meth-cta">
+      <h3>Score any repo, package, or skill</h3>
+      <p>Paste a GitHub URL, npm package name, Smithery listing, or OpenClaw skill. Results in 10 seconds.</p>
+      <a href="/">Scan now</a>
+    </div>
+
+    <footer class="meth-footer">
+      <a href="/">MCP Skills</a> · <a href="/certified">Certified Safe</a> · <a href="/digest">Weekly Digest</a> · <a href="/data/latest.json">Data Export</a>
+    </footer>
+  </div>
+</body>
+</html>

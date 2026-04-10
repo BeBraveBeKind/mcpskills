@@ -15,6 +15,7 @@ const STATIC_PAGES = [
   { loc: 'https://mcpskills.io/',                                changefreq: 'weekly',  priority: '1.0' },
   { loc: 'https://mcpskills.io/certified',                        changefreq: 'daily',   priority: '0.9' },
   { loc: 'https://mcpskills.io/trending',                         changefreq: 'daily',   priority: '0.9' },
+  { loc: 'https://mcpskills.io/methodology',                      changefreq: 'monthly', priority: '0.8' },
   { loc: 'https://mcpskills.io/roadmap',                          changefreq: 'monthly', priority: '0.6' },
   { loc: 'https://mcpskills.io/certify',                          changefreq: 'monthly', priority: '0.6' },
   { loc: 'https://mcpskills.io/blog/state-of-ai-skill-security',  changefreq: 'monthly', priority: '0.8' },
